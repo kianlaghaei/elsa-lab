@@ -17,6 +17,7 @@ The runner uses Elsa's `Elsa` bundle package at 3.8.4. The project does not conf
 | ELSA-03 — Custom Activity + DI | [`bf50d68bfde14ba0a51a73a5ff134b4bc878148c`](https://github.com/kianlaghaei/elsa-lab/commit/bf50d68bfde14ba0a51a73a5ff134b4bc878148c) | [Experiment record](../experiments/ELSA-03-custom-activity-di.md) |
 | ELSA-04 — Flowchart Routing | [`24f7d2554b9259806896b9e36c94c62241769f9b`](https://github.com/kianlaghaei/elsa-lab/commit/24f7d2554b9259806896b9e36c94c62241769f9b) | [Experiment record](../experiments/ELSA-04-flowchart-routing.md) |
 | ELSA-05 — Loops and Revision Cycles | [`35fe9f8232277bf930c77cc5e47a10509d3e03ed`](https://github.com/kianlaghaei/elsa-lab/commit/35fe9f8232277bf930c77cc5e47a10509d3e03ed) | [Experiment record](../experiments/ELSA-05-revision-cycles.md) |
+| ELSA-06 — Parallel Execution + Join | Feature implementation commit recorded in the ELSA-06 page | [Experiment record](../experiments/ELSA-06-parallel-join.md) |
 
 ## Upgrade rule
 

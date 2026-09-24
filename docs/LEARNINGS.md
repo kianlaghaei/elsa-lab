@@ -14,6 +14,8 @@ This is the concise index of verified findings. Each statement is scoped to the 
 - **Observed in ELSA-04:** `FlowDecision` records a `True` or `False` outcome; only the selected branch appeared in journal activity contexts, and the two tested routes converged on the shared completion Sequence. See [ELSA-04](experiments/ELSA-04-flowchart-routing.md) and [flowchart routing](reference/flowchart-routing.md).
 - **Observed in ELSA-05:** A token-based `Flowchart` completed a finite revision cycle through an explicit backward connection. Each repeated visit retained the same Activity definition identity but had a distinct activity execution context and ID; workflow variables carried revision and review-round state. See [ELSA-05](experiments/ELSA-05-revision-cycles.md) and [Flowchart cycles](reference/flowchart-cycles.md).
 - **Observed in ELSA-05:** A repeated activity's output was present in each corresponding journal context, while the final workflow output contained the last review summary. The cycle recorded `True`, `True`, `False` decision outcomes and no separate connection activity context. This was tested in token-based mode only. See [ELSA-05](experiments/ELSA-05-revision-cycles.md).
+- **Observed in ELSA-06:** A token-based `Flowchart` with `FlowFork` and `FlowJoin(WaitAll)` ran all three discipline branches and withheld consolidation until the controlled Mechanical branch completed. Each branch had its own output and graph-node identity. See [ELSA-06](experiments/ELSA-06-parallel-join.md) and [parallel execution and join](reference/parallel-and-join.md).
+- **Observed in ELSA-06:** In the tested default in-process runner, asynchronous review calls did not overlap: the scheduler awaited each queued activity in turn, and the controlled service measured maximum active reviews of one. The join context exposed `Mode=WaitAll`, not an arrival ledger; the completed Flowchart's token list was empty. These observations do not describe external dispatch or other hosts. See [ELSA-06](experiments/ELSA-06-parallel-join.md).
 
 ## Reference guides
 
@@ -21,6 +23,7 @@ This is the concise index of verified findings. Each statement is scoped to the 
 - [Activities and dependency injection](reference/activities-and-di.md)
 - [Flowchart routing](reference/flowchart-routing.md)
 - [Flowchart cycles](reference/flowchart-cycles.md)
+- [Parallel execution and join](reference/parallel-and-join.md)
 - [Activity/application-service pattern](patterns/activity-application-service.md)
 - [Verified Elsa 3.8.4 baseline](versions/elsa-3.8.4.md)
 - [Documentation index and untested coverage](INDEX.md)

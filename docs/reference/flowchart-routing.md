@@ -1,6 +1,6 @@
 # Flowchart Routing
 
-This reference summarizes the Boolean, exclusive-routing graph executed in [ELSA-04](../experiments/ELSA-04-flowchart-routing.md). Cyclic execution is summarized separately in [Flowchart cycles](flowchart-cycles.md), based on ELSA-05. Neither page establishes parallel semantics.
+This reference summarizes the Boolean, exclusive-routing graph executed in [ELSA-04](../experiments/ELSA-04-flowchart-routing.md). Cyclic execution is summarized separately in [Flowchart cycles](flowchart-cycles.md), based on ELSA-05. Parallel graph fan-out and joining are covered in [Parallel execution and join](parallel-and-join.md), based on ELSA-06.
 
 ## Tested graph model
 

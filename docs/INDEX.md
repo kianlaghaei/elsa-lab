@@ -18,6 +18,7 @@ Each experiment page records observed behavior, source-confirmed details, infere
 - [ELSA-03 — Custom Activity + Dependency Injection](experiments/ELSA-03-custom-activity-di.md)
 - [ELSA-04 — Flowchart + Conditional Routing](experiments/ELSA-04-flowchart-routing.md)
 - [ELSA-05 — Loops and Revision Cycles](experiments/ELSA-05-revision-cycles.md)
+- [ELSA-06 — Parallel Execution + Join](experiments/ELSA-06-parallel-join.md)
 
 ## Reference
 
@@ -27,6 +28,7 @@ These pages synthesize repeated knowledge and point back to experiments for evid
 - [Activities and dependency injection](reference/activities-and-di.md)
 - [Flowchart routing](reference/flowchart-routing.md)
 - [Flowchart cycles](reference/flowchart-cycles.md)
+- [Parallel execution and join](reference/parallel-and-join.md)
 
 ## Patterns
 
@@ -35,7 +37,7 @@ These pages synthesize repeated knowledge and point back to experiments for evid
 ## Version Notes
 
 - [Elsa 3.8.4 baseline](versions/elsa-3.8.4.md)
-- All five completed experiments were verified against Elsa 3.8.4 and .NET 10 (`net10.0`). Re-run relevant experiments before relying on these findings after an Elsa upgrade.
+- All six completed experiments were verified against Elsa 3.8.4 and .NET 10 (`net10.0`). Re-run relevant experiments before relying on these findings after an Elsa upgrade.
 
 ## Current Knowledge Coverage
 
@@ -46,7 +48,7 @@ These pages synthesize repeated knowledge and point back to experiments for evid
 | Custom Activity, DI, Activity output, cancellation-token propagation, and tested Activity reuse | ELSA-03 |
 | Conditional routing with `FlowDecision` | ELSA-04 |
 | Loops and revision cycles | ELSA-05 |
-| Parallel execution and join | Not yet tested (ELSA-06) |
+| Parallel execution and join | ELSA-06 |
 | Bookmarks / blocking activities | Not yet tested (ELSA-07) |
 | External events and wait/resume | Not yet tested (ELSA-08) |
 | Persistence | Not yet tested (ELSA-09) |
