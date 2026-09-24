@@ -1,58 +1,64 @@
 using Elsa.Extensions;
 using Elsa.Workflows;
-using Elsa.Workflows.Activities.Flowchart.Activities;
-using Elsa.Workflows.Activities.Flowchart.Extensions;
 using Elsa.Workflows.Options;
 using ElsaLab.Runner.Activities;
-using ElsaLab.Runner.Services;
 using ElsaLab.Runner.Workflows;
 using Microsoft.Extensions.DependencyInjection;
 
+const string documentNumber = "DPC-10-ME-0001";
+const int revision = 2;
+const string reviewKey = "discipline-review";
+
 var services = new ServiceCollection();
-services.AddScoped<IDocumentDisciplineReviewService, DocumentDisciplineReviewService>();
 services.AddElsa(elsa =>
 {
-    elsa.AddActivity<ReviewDisciplineActivity>();
-    elsa.AddActivity<ConsolidateReviewsActivity>();
-    elsa.AddWorkflow<DocumentDisciplineReviewWorkflow>();
+    elsa.AddActivity<WaitForDocumentReviewActivity>();
+    elsa.AddWorkflow<DocumentReviewBlockingWorkflow>();
 });
 
 using var serviceProvider = services.BuildServiceProvider();
 using var scope = serviceProvider.CreateScope();
 var workflowRunner = scope.ServiceProvider.GetRequiredService<IWorkflowRunner>();
-Console.WriteLine("Document discipline review (Elsa token-based Flowchart; WaitAll join)");
-Console.WriteLine("DocumentNumber=DPC-10-ME-0001");
+Console.WriteLine("Document review blocking demonstration (in-memory Elsa bookmark)");
+Console.WriteLine($"DocumentNumber={documentNumber}, Revision={revision}, ReviewKey={reviewKey}");
 
 var result = await workflowRunner.RunAsync(
-    new DocumentDisciplineReviewWorkflow(),
+    new DocumentReviewBlockingWorkflow(),
     new RunWorkflowOptions
     {
         Input = new Dictionary<string, object>
         {
-            ["DocumentNumber"] = "DPC-10-ME-0001"
+            ["DocumentNumber"] = documentNumber,
+            ["Revision"] = revision,
+            ["ReviewKey"] = reviewKey
         }
-    }.WithTokenBasedFlowchart());
+    });
 
-Console.WriteLine("Post-run activity journal (execution order):");
 foreach (var context in result.Journal.ActivityExecutionContexts.OrderBy(context => context.StartedAt))
 {
-    if (context.Activity is ReviewDisciplineActivity)
-        Console.WriteLine($"{context.Activity.Name}: {context.GetOutputs()[nameof(ReviewDisciplineActivity.ReviewResult)]}");
-    else if (context.Activity is FlowJoin)
-        Console.WriteLine($"FlowJoin completed: {context.GetInputs()["Mode"]}");
-    else if (context.Activity.Name == "ConsolidateReviews")
-        Console.WriteLine($"ConsolidateReviews completed: {context.GetOutputs()[nameof(ConsolidateReviewsActivity.ConsolidatedStatus)]}");
+    var activityName = string.IsNullOrEmpty(context.Activity.Name) ? "<workflow-root>" : context.Activity.Name;
+    var schedulingExecutionId = context.SchedulingActivityExecutionId ?? "none";
+    Console.WriteLine(
+        $"Activity {activityName}: {context.Status}; execution={context.Id}; activity={context.Activity.Id}; " +
+        $"node={context.Activity.NodeId}; scheduledBy={schedulingExecutionId}; executionCount={context.ExecutionCount}; " +
+        $"journalDataKeys=[{string.Join(", ", context.JournalData.Keys)}]");
 }
 
-Console.WriteLine($"Process review: {result.WorkflowState.Output["ProcessReview"]}");
-Console.WriteLine($"Mechanical review: {result.WorkflowState.Output["MechanicalReview"]}");
-Console.WriteLine($"Instrument review: {result.WorkflowState.Output["InstrumentReview"]}");
-Console.WriteLine($"Consolidated status: {result.WorkflowState.Output["ConsolidatedStatus"]}");
+foreach (var bookmark in result.WorkflowState.Bookmarks)
+{
+    var payload = (DocumentReviewBookmarkPayload)bookmark.Payload!;
+    Console.WriteLine(
+        $"Bookmark {bookmark.Name} ({bookmark.Id}): {payload.DocumentNumber}, revision {payload.Revision}, key {payload.ReviewKey}");
+}
+
+var finalized = result.Journal.ActivityExecutionContexts.Any(context => context.Activity.Name == "FinalizeDocument");
 Console.WriteLine($"Workflow status: {result.WorkflowState.Status}");
 Console.WriteLine($"Workflow substatus: {result.WorkflowExecutionContext.SubStatus}");
-Console.WriteLine($"Typed workflow result: {result.Result}");
+Console.WriteLine($"FinalizeDocument executed: {finalized}");
 
-return result.WorkflowState.Status == WorkflowStatus.Finished &&
-       result.WorkflowExecutionContext.SubStatus == WorkflowSubStatus.Finished
+return result.WorkflowState.Status == WorkflowStatus.Running &&
+       result.WorkflowExecutionContext.SubStatus == WorkflowSubStatus.Suspended &&
+       result.WorkflowState.Bookmarks.Count == 1 &&
+       !finalized
     ? 0
     : 1;

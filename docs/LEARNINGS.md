@@ -16,6 +16,9 @@ This is the concise index of verified findings. Each statement is scoped to the 
 - **Observed in ELSA-05:** A repeated activity's output was present in each corresponding journal context, while the final workflow output contained the last review summary. The cycle recorded `True`, `True`, `False` decision outcomes and no separate connection activity context. This was tested in token-based mode only. See [ELSA-05](experiments/ELSA-05-revision-cycles.md).
 - **Observed in ELSA-06:** A token-based `Flowchart` with `FlowFork` and `FlowJoin(WaitAll)` ran all three discipline branches and withheld consolidation until the controlled Mechanical branch completed. Each branch had its own output and graph-node identity. See [ELSA-06](experiments/ELSA-06-parallel-join.md) and [parallel execution and join](reference/parallel-and-join.md).
 - **Observed in ELSA-06:** In the tested default in-process runner, asynchronous review calls did not overlap: the scheduler awaited each queued activity in turn, and the controlled service measured maximum active reviews of one. The join context exposed `Mode=WaitAll`, not an arrival ledger; the completed Flowchart's token list was empty. These observations do not describe external dispatch or other hosts. See [ELSA-06](experiments/ELSA-06-parallel-join.md).
+- **Observed in ELSA-07:** A custom `Activity` that calls `ActivityExecutionContext.CreateBookmark(...)` and does not complete remains `Running`; the returned workflow has `WorkflowSubStatus.Suspended` and top-level `WorkflowStatus.Running`. A later Sequence step is absent from the journal. See [ELSA-07](experiments/ELSA-07-blocking-bookmark.md) and [blocking Activities and bookmarks](reference/blocking-and-bookmarks.md).
+- **Observed in ELSA-07:** The bookmark appears in `WorkflowExecutionContext.Bookmarks`, `WorkflowState.Bookmarks`, and the owning `ActivityExecutionContext.Bookmarks`; it is not a separate activity journal context, and the wait Activity's `JournalData` was empty. Reusing one graph retained Activity definition identity while giving each run separate workflow/execution/bookmark IDs and payload state. See [ELSA-07](experiments/ELSA-07-blocking-bookmark.md).
+- **Source-confirmed and explicitly handled in ELSA-07:** When creating with `CreateBookmarkArgs`, `IncludeActivityInstanceId` defaults to false; the experiment sets it to true so it participates in the bookmark hash. No resume, durable storage, or restart behavior was tested. See [ELSA-07](experiments/ELSA-07-blocking-bookmark.md).
 
 ## Reference guides
 
@@ -24,6 +27,7 @@ This is the concise index of verified findings. Each statement is scoped to the 
 - [Flowchart routing](reference/flowchart-routing.md)
 - [Flowchart cycles](reference/flowchart-cycles.md)
 - [Parallel execution and join](reference/parallel-and-join.md)
+- [Blocking Activities and Bookmarks](reference/blocking-and-bookmarks.md)
 - [Activity/application-service pattern](patterns/activity-application-service.md)
 - [Verified Elsa 3.8.4 baseline](versions/elsa-3.8.4.md)
 - [Documentation index and untested coverage](INDEX.md)

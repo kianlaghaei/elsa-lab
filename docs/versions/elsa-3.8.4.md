@@ -18,6 +18,7 @@ The runner uses Elsa's `Elsa` bundle package at 3.8.4. The project does not conf
 | ELSA-04 — Flowchart Routing | [`24f7d2554b9259806896b9e36c94c62241769f9b`](https://github.com/kianlaghaei/elsa-lab/commit/24f7d2554b9259806896b9e36c94c62241769f9b) | [Experiment record](../experiments/ELSA-04-flowchart-routing.md) |
 | ELSA-05 — Loops and Revision Cycles | [`35fe9f8232277bf930c77cc5e47a10509d3e03ed`](https://github.com/kianlaghaei/elsa-lab/commit/35fe9f8232277bf930c77cc5e47a10509d3e03ed) | [Experiment record](../experiments/ELSA-05-revision-cycles.md) |
 | ELSA-06 — Parallel Execution + Join | [`47c152954945dce32b75ec3df77443c043653c09`](https://github.com/kianlaghaei/elsa-lab/commit/47c152954945dce32b75ec3df77443c043653c09) | [Experiment record](../experiments/ELSA-06-parallel-join.md) |
+| ELSA-07 — Blocking Activity / Bookmark | Pending feature commit | [Experiment record](../experiments/ELSA-07-blocking-bookmark.md) |
 
 ## Upgrade rule
 

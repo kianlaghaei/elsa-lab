@@ -10,7 +10,7 @@ Status: **TODO**, **IN PROGRESS**, **DONE**, or **BLOCKED**.
 | ELSA-04 | Flowchart + Conditional Routing | DONE |
 | ELSA-05 | Loops and Revision Cycles | DONE |
 | ELSA-06 | Parallel Execution + Join | DONE |
-| ELSA-07 | Blocking Activity / Bookmark | TODO |
+| ELSA-07 | Blocking Activity / Bookmark | DONE |
 | ELSA-08 | External Event + Suspend / Resume | TODO |
 | ELSA-09 | SQL Server Persistence | TODO |
 | ELSA-10 | Process Kill + Restart + Resume | TODO |

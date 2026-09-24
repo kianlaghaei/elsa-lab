@@ -19,6 +19,7 @@ Each experiment page records observed behavior, source-confirmed details, infere
 - [ELSA-04 — Flowchart + Conditional Routing](experiments/ELSA-04-flowchart-routing.md)
 - [ELSA-05 — Loops and Revision Cycles](experiments/ELSA-05-revision-cycles.md)
 - [ELSA-06 — Parallel Execution + Join](experiments/ELSA-06-parallel-join.md)
+- [ELSA-07 — Blocking Activity / Bookmark](experiments/ELSA-07-blocking-bookmark.md)
 
 ## Reference
 
@@ -29,6 +30,7 @@ These pages synthesize repeated knowledge and point back to experiments for evid
 - [Flowchart routing](reference/flowchart-routing.md)
 - [Flowchart cycles](reference/flowchart-cycles.md)
 - [Parallel execution and join](reference/parallel-and-join.md)
+- [Blocking Activities and Bookmarks](reference/blocking-and-bookmarks.md)
 
 ## Patterns
 
@@ -37,7 +39,7 @@ These pages synthesize repeated knowledge and point back to experiments for evid
 ## Version Notes
 
 - [Elsa 3.8.4 baseline](versions/elsa-3.8.4.md)
-- All six completed experiments were verified against Elsa 3.8.4 and .NET 10 (`net10.0`). Re-run relevant experiments before relying on these findings after an Elsa upgrade.
+- All seven completed experiments were verified against Elsa 3.8.4 and .NET 10 (`net10.0`). Re-run relevant experiments before relying on these findings after an Elsa upgrade.
 
 ## Current Knowledge Coverage
 
@@ -49,7 +51,7 @@ These pages synthesize repeated knowledge and point back to experiments for evid
 | Conditional routing with `FlowDecision` | ELSA-04 |
 | Loops and revision cycles | ELSA-05 |
 | Parallel execution and join | ELSA-06 |
-| Bookmarks / blocking activities | Not yet tested (ELSA-07) |
+| Blocking Activity / bookmark creation and suspended in-memory state | ELSA-07 |
 | External events and wait/resume | Not yet tested (ELSA-08) |
 | Persistence | Not yet tested (ELSA-09) |
 | Process restart and resume | Not yet tested (ELSA-10) |
