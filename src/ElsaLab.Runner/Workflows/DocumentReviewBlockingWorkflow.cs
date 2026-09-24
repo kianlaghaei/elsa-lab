@@ -13,6 +13,7 @@ public sealed class DocumentReviewBlockingWorkflow : WorkflowBase
         var documentNumberInput = builder.WithInput<string>("DocumentNumber");
         var revisionInput = builder.WithInput<int>("Revision");
         var reviewKeyInput = builder.WithInput<string>("ReviewKey");
+        var publishReviewPayloadOnResumeInput = builder.WithInput<bool>("PublishReviewPayloadOnResume");
         var reviewOutcomeInput = builder.WithInput<string>("ReviewOutcome");
         var reviewerInput = builder.WithInput<string>("Reviewer");
 
@@ -20,6 +21,18 @@ public sealed class DocumentReviewBlockingWorkflow : WorkflowBase
         builder.WithOutput<bool>("Finalized");
         builder.WithOutput<string>("ReviewOutcome");
         builder.WithOutput<string>("Reviewer");
+        builder.WithOutput<string>("FinalDocumentNumber");
+        builder.WithOutput<int>("FinalRevision");
+        builder.WithOutput<string>("FinalReviewKey");
+
+        var waitForDocumentReview = new WaitForDocumentReviewActivity
+        {
+            Name = "WaitForDocumentReview",
+            DocumentNumber = new(context => context.GetInput<string>(documentNumberInput)!),
+            Revision = new(context => context.GetInput<int>(revisionInput)),
+            ReviewKey = new(context => context.GetInput<string>(reviewKeyInput)!),
+            PublishReviewPayloadOnResume = new(context => context.GetInput<bool>(publishReviewPayloadOnResumeInput))
+        };
 
         builder.Root = new Sequence
         {
@@ -31,13 +44,7 @@ public sealed class DocumentReviewBlockingWorkflow : WorkflowBase
                 {
                     Name = "PrepareDocumentReview"
                 },
-                new WaitForDocumentReviewActivity
-                {
-                    Name = "WaitForDocumentReview",
-                    DocumentNumber = new(context => context.GetInput<string>(documentNumberInput)!),
-                    Revision = new(context => context.GetInput<int>(revisionInput)),
-                    ReviewKey = new(context => context.GetInput<string>(reviewKeyInput)!)
-                },
+                waitForDocumentReview,
                 new Sequence
                 {
                     Name = "FinalizeDocument",
@@ -66,7 +73,7 @@ public sealed class DocumentReviewBlockingWorkflow : WorkflowBase
                         {
                             OutputName = new("Reviewer"),
                             OutputValue = new(context => context.GetInput<string>(reviewerInput)!)
-                        }
+                        },
                     }
                 }
             }
