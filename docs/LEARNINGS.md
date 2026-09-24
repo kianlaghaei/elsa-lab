@@ -138,3 +138,56 @@ This is an appropriate adapter pattern for `CreateTransmittal`, `ConsolidateComm
 - [`WorkflowRunner`](https://github.com/elsa-workflows/elsa-core/blob/3.8.4/src/modules/Elsa.Workflows.Core/Services/WorkflowRunner.cs), [`WorkflowsFeature`](https://github.com/elsa-workflows/elsa-core/blob/3.8.4/src/modules/Elsa.Workflows.Core/Features/WorkflowsFeature.cs), and [`WorkflowGraphBuilder`](https://github.com/elsa-workflows/elsa-core/blob/3.8.4/src/modules/Elsa.Workflows.Core/Services/WorkflowGraphBuilder.cs) for runner service lifetime, execution provider/cancellation propagation, and graph construction.
 - Elsa's tagged [activity-output integration scenario](https://github.com/elsa-workflows/elsa-core/tree/3.8.4/test/integration/Elsa.Workflows.IntegrationTests/Scenarios/ActivityOutputs) for its `CodeActivity<T>.Result` and downstream `GetResult<T>` usage. The named outputs in this experiment use the corresponding `GetOutput<T>` accessor.
 - Elsa's [custom activities guide](https://docs.elsaworkflows.io/extensibility/custom-activities) describes `CodeActivity`, context-based service resolution, and typed input/output ports. The implementation details above were checked against the installed 3.8.4 source and runtime behavior.
+
+## ELSA-04 — Flowchart + Conditional Routing
+
+### Selected routing approach
+
+**Observed in this test:** The code-first root is Elsa's `Flowchart`, with an explicit `Start` activity, an `Activities` collection, and `Connection`s. The document input `RequiresReview` feeds `FlowDecision`; its `True` and `False` outcomes route to separately named `SetVariable<string>` activities. The workflow sets `FlowchartExecutionMode.CounterBased` per run through `WithCounterBasedFlowchart()` so the tested merge behavior is explicit.
+
+**Confirmed in Elsa 3.8.4 source:** A `Connection` contains source and target `Endpoint`s; an endpoint has an optional port name. `Connection` has no boolean condition property. The Flowchart matches a completed activity's outcome names against each outbound connection's source port. Ordinary activities in this graph use the `Done` outcome; `FlowDecision` emits `True` or `False`.
+
+**Why selected:** `RequiresReview` is a Boolean and the built-in `FlowDecision` evaluates an Elsa `Input<bool>` condition and completes with exactly the `True` or `False` outcome needed by this graph. The condition is constructed as `new FlowDecision(context => context.GetInput<bool>(requiresReviewInput))`; it reads the workflow input in Elsa's expression context when the node executes.
+
+**Alternatives confirmed in source, not implemented here:** `FlowSwitch` evaluates labeled cases and emits the matching case label (or `Default`); it is a better fit for multi-value selection. A custom activity can declare named outcomes with `[FlowNode(...)]` and complete through `CompleteActivityWithOutcomesAsync`. Elsa also has token-based Flowchart execution and explicit `FlowJoin` merge modes. The tagged FlowDecision integration tests cover both counter-based and token-based modes, but this lab experiment explicitly tests counter-based routing only. A conditional predicate directly on `Connection` is not part of the 3.8.4 `Connection` model.
+
+### Branches and shared completion
+
+**Observed in this test:** `RequiresReview=true` sets `ProcessingStatus` to `Reviewed`; `false` sets it to `AutoAccepted`. Both branch activities connect to one `CompleteDocument` Sequence, which publishes the service's `IsValid`, `ProcessingMessage`, and `RegistrationReference` values plus the branch-specific `ProcessingStatus` as named workflow outputs, then assigns the typed workflow result. Each route's test sees that common completion sequence exactly once.
+
+**Confirmed in Elsa 3.8.4 source:** In counter-based mode an ordinary target with multiple inbound connections uses the implicit `WaitAllActive` merge. Elsa records inbound connection visits and schedules the target when the active inbound path has arrived and the alternatives have been accounted for. This supports the exclusive branch convergence used here without a `FlowJoin` activity. The official tagged `FlowDecisionTests` also exercise two mutually exclusive branches converging on one activity.
+
+### Runtime journal and state
+
+**Observed in this test:** The journal contains a completed Flowchart execution context and a `FlowDecision` context. The decision's `JournalData["Outcomes"]` is a `string[]` containing only `True` or only `False`, matching the caller input. The selected branch appears in the journal; the unselected branch has no activity execution context. The common `CompleteDocument` Sequence appears once. There is no separate per-connection journal entry in the returned activity-context list, so the chosen edge is evidenced by the decision outcome plus the selected target activity.
+
+**Observed in this test:** `WorkflowState.Output` contains all four named outputs, and the typed workflow result contains the same branch status. The registered activity's own outputs are captured into workflow variables before the decision and then read by the shared completion Sequence. Both tests assert `WorkflowStatus.Finished`, `WorkflowSubStatus.Finished`, and the absence of faulted activity contexts.
+
+### Sequence vs Flowchart
+
+#### Sequence
+
+**Observed in ELSA-01 through ELSA-03:** `Sequence` ran its activities in the declared order, which made a straight path such as `A → B → C` compact and easy to follow. The ELSA-04 graph still uses a short Sequence for the shared completion steps.
+
+#### Flowchart
+
+**Observed in ELSA-04:** Flowchart schedules activities by graph connections and the outcomes selected by a decision. The journal makes the decision outcome and executed branch inspectable, while the unused branch is absent from activity execution contexts. The workflow needed explicit node and connection declarations that the earlier linear Sequence did not need.
+
+**Inferred for future EDMS use:** Prefer a Sequence for an unbranched operation list. A Flowchart is more readable when named branch paths and convergence are part of the process, though it adds graph wiring to the code. The review requirement here is a small example of the latter.
+
+### EDMS relevance
+
+**Inferred, not implemented:** Rules such as `RequiresClientApproval?`, `RequiresVendorResponse?`, `HasComments?`, and `RevisionIsValid?` can map to Boolean `FlowDecision` nodes and outcome-labeled connections. A rule with several named categories may fit `FlowSwitch`. `RequiresMultiDisciplineReview?` may lead to more complex review behavior, but parallel execution and joins are outside this experiment.
+
+### Anything surprising in Elsa's API
+
+**Observed in this test:** The branch outcome is recorded in the activity context's `JournalData`, not as a connection execution context. To verify the selected path, the tests combine that outcome with the presence/absence of the named branch activity and the common continuation.
+
+**Confirmed in source:** Flowchart has both counter-based and token-based execution modes, and merge behavior can vary by mode or explicit `FlowJoin`. The experiment pins counter-based mode rather than relying on its default. Top-level `WorkflowStatus.Finished` alone remains insufficient evidence of success; the tests also check `WorkflowSubStatus.Finished` and activity faults, as established in ELSA-03.
+
+### Elsa 3.8.4 source and tests checked
+
+- [`Flowchart`](https://github.com/elsa-workflows/elsa-core/blob/3.8.4/src/modules/Elsa.Workflows.Core/Activities/Flowchart/Activities/Flowchart.cs), [`Connection`](https://github.com/elsa-workflows/elsa-core/blob/3.8.4/src/modules/Elsa.Workflows.Core/Activities/Flowchart/Models/Connection.cs), and [`Endpoint`](https://github.com/elsa-workflows/elsa-core/blob/3.8.4/src/modules/Elsa.Workflows.Core/Activities/Flowchart/Models/Endpoint.cs) for graph setup and port-based edges.
+- [`FlowDecision`](https://github.com/elsa-workflows/elsa-core/blob/3.8.4/src/modules/Elsa.Workflows.Core/Activities/Flowchart/Activities/FlowDecision.cs), [`FlowNodeAttribute`](https://github.com/elsa-workflows/elsa-core/blob/3.8.4/src/modules/Elsa.Workflows.Core/Activities/Flowchart/Attributes/FlowNodeAttribute.cs), [`FlowSwitch`](https://github.com/elsa-workflows/elsa-core/blob/3.8.4/src/modules/Elsa.Workflows.Core/Activities/Flowchart/Activities/FlowSwitch.cs), and [`FlowJoin`](https://github.com/elsa-workflows/elsa-core/blob/3.8.4/src/modules/Elsa.Workflows.Core/Activities/Flowchart/Activities/FlowJoin.cs) for routing alternatives.
+- [`Flowchart counter execution and implicit merge`](https://github.com/elsa-workflows/elsa-core/blob/3.8.4/src/modules/Elsa.Workflows.Core/Activities/Flowchart/Activities/Flowchart.Counters.cs), [`run-option mode selection`](https://github.com/elsa-workflows/elsa-core/blob/3.8.4/src/modules/Elsa.Workflows.Core/Activities/Flowchart/Extensions/RunWorkflowOptionsExtensions.cs), and [`outcome recording on completion`](https://github.com/elsa-workflows/elsa-core/blob/3.8.4/src/modules/Elsa.Workflows.Core/Contexts/ActivityExecutionContext.Complete.cs).
+- Tagged Elsa [`FlowDecision integration tests`](https://github.com/elsa-workflows/elsa-core/blob/3.8.4/test/integration/Elsa.Activities.IntegrationTests/Branching/FlowDecisionTests.cs) for outcome-based routing and branch convergence, including counter-based and token-based cases.

@@ -2,11 +2,11 @@
 
 ElsaLab is a separate experimental repository for learning and evaluating Elsa Workflows 3 as natively as possible for future EDMS and FLOREX use. It is not a production application or a custom workflow engine.
 
-The work is incremental. **ELSA-01 — Basic Code-First Execution**, **ELSA-02 — WorkflowBase, Inputs, Outputs and Variables**, and **ELSA-03 — Custom Activity + Dependency Injection** are complete. See [ROADMAP.md](ROADMAP.md) and [docs/LEARNINGS.md](docs/LEARNINGS.md) for their status and observed results.
+The work is incremental. **ELSA-01 — Basic Code-First Execution**, **ELSA-02 — WorkflowBase, Inputs, Outputs and Variables**, **ELSA-03 — Custom Activity + Dependency Injection**, and **ELSA-04 — Flowchart + Conditional Routing** are complete. See [ROADMAP.md](ROADMAP.md) and [docs/LEARNINGS.md](docs/LEARNINGS.md) for their status and observed results.
 
-## ELSA-03: Custom Activity + Dependency Injection
+## ELSA-04: Flowchart + Conditional Routing
 
-`DocumentProcessingWorkflow` passes typed workflow inputs to the custom `RegisterDocumentActivity`. The activity delegates registration to the scoped `IDocumentProcessingService`, publishes native Elsa outputs, and the later workflow steps capture and expose those values. The runner resolves Elsa's scoped `IWorkflowRunner` from a DI scope and inspects the final state, outputs, and typed workflow result.
+`DocumentProcessingWorkflow` uses an Elsa `Flowchart` and `FlowDecision` to route the `RequiresReview` workflow input to either `ReviewDocument` or `AutoAcceptDocument`. Both outcomes connect to a shared completion Sequence. The custom `RegisterDocumentActivity` continues to delegate registration to `IDocumentProcessingService` and its Elsa output is captured by the workflow.
 
 ## Run the experiment
 
@@ -22,11 +22,12 @@ dotnet run --project src/ElsaLab.Runner/ElsaLab.Runner.csproj
 Expected console output:
 
 ```text
-Downstream step consumed registration output: DocumentNumber=DPC-10-ME-0001, Revision=2, IsValid=True, RegistrationReference=REG-DPC-10-ME-0001-R2, ProcessingMessage=Registered DPC-10-ME-0001, revision 2.
-Caller inputs: DocumentNumber=DPC-10-ME-0001, Revision=2
+Completed DPC-10-ME-0001 revision 2: ProcessingStatus=Reviewed, IsValid=True, RegistrationReference=REG-DPC-10-ME-0001-R2, ProcessingMessage=Registered DPC-10-ME-0001, revision 2.
+Caller inputs: DocumentNumber=DPC-10-ME-0001, Revision=2, RequiresReview=True
 Workflow status: Finished
-Typed workflow result: RegistrationReference=REG-DPC-10-ME-0001-R2
-Workflow outputs: IsValid=True, ProcessingMessage=Registered DPC-10-ME-0001, revision 2., RegistrationReference=REG-DPC-10-ME-0001-R2
+Workflow substatus: Finished
+Typed workflow result: ProcessingStatus=Reviewed
+Workflow outputs: ProcessingStatus=Reviewed, RegistrationReference=REG-DPC-10-ME-0001-R2
 ```
 
 ## Structure

@@ -1,5 +1,8 @@
 using Elsa.Extensions;
 using Elsa.Workflows;
+using Elsa.Workflows.Activities.Flowchart.Activities;
+using Elsa.Workflows.Activities.Flowchart.Extensions;
+using Elsa.Workflows.Models;
 using Elsa.Workflows.Options;
 using ElsaLab.Runner.Activities;
 using ElsaLab.Runner.Services;
@@ -14,7 +17,7 @@ public class DocumentProcessingWorkflowTests
     private const int Revision = 2;
 
     [Fact]
-    public async Task DocumentProcessingWorkflow_UsesRegisteredService_AndFinishes()
+    public async Task RequiresReviewTrue_RoutesToReviewAndRejoinsCompletion()
     {
         var services = new ServiceCollection();
         services.AddScoped<IDocumentProcessingService, DocumentProcessingService>();
@@ -26,19 +29,18 @@ public class DocumentProcessingWorkflowTests
 
         var result = await workflowRunner.RunAsync(
             new DocumentProcessingWorkflow(),
-            new RunWorkflowOptions { Input = CreateInput() });
+            CreateOptions(DocumentNumber, requiresReview: true));
 
-        Assert.Equal(WorkflowStatus.Finished, result.WorkflowState.Status);
-        Assert.Equal(WorkflowSubStatus.Finished, result.WorkflowExecutionContext.SubStatus);
-        Assert.Equal("REG-DPC-10-ME-0001-R2", result.Result);
+        AssertSuccessfulBranch(result, "True", "ReviewDocument", "AutoAcceptDocument");
+        Assert.Equal("Reviewed", result.Result);
         Assert.Equal(true, result.WorkflowState.Output["IsValid"]);
         Assert.Equal("Registered DPC-10-ME-0001, revision 2.", result.WorkflowState.Output["ProcessingMessage"]);
+        Assert.Equal("Reviewed", result.WorkflowState.Output["ProcessingStatus"]);
         Assert.Equal("REG-DPC-10-ME-0001-R2", result.WorkflowState.Output["RegistrationReference"]);
-        Assert.Equal(DocumentNumber, result.WorkflowExecutionContext.Input["DocumentNumber"]);
-        Assert.Equal(Revision, result.WorkflowExecutionContext.Input["Revision"]);
+        Assert.Equal(true, result.WorkflowExecutionContext.Input["RequiresReview"]);
 
-        var registrationContext = result.Journal.ActivityExecutionContexts.Single(context => context.Activity is RegisterDocumentActivity);
-        Assert.Equal(ActivityStatus.Completed, registrationContext.Status);
+        var registrationContext = result.Journal.ActivityExecutionContexts
+            .Single(context => context.Activity is RegisterDocumentActivity);
         Assert.Equal(DocumentNumber, registrationContext.GetInputs()["DocumentNumber"]);
         Assert.Equal(Revision, registrationContext.GetInputs()["Revision"]);
         Assert.Equal(true, registrationContext.GetOutputs()["IsValid"]);
@@ -47,7 +49,31 @@ public class DocumentProcessingWorkflowTests
     }
 
     [Fact]
-    public async Task DocumentProcessingWorkflow_UsesFakeServiceThroughDi_AndPassesOutputToLaterSteps()
+    public async Task RequiresReviewFalse_RoutesToFastPathAndRejoinsCompletion()
+    {
+        var services = new ServiceCollection();
+        services.AddScoped<IDocumentProcessingService, DocumentProcessingService>();
+        AddWorkflowServices(services);
+
+        using var serviceProvider = services.BuildServiceProvider();
+        using var scope = serviceProvider.CreateScope();
+        var workflowRunner = scope.ServiceProvider.GetRequiredService<IWorkflowRunner>();
+
+        var result = await workflowRunner.RunAsync(
+            new DocumentProcessingWorkflow(),
+            CreateOptions(DocumentNumber, requiresReview: false));
+
+        AssertSuccessfulBranch(result, "False", "AutoAcceptDocument", "ReviewDocument");
+        Assert.Equal("AutoAccepted", result.Result);
+        Assert.Equal(true, result.WorkflowState.Output["IsValid"]);
+        Assert.Equal("Registered DPC-10-ME-0001, revision 2.", result.WorkflowState.Output["ProcessingMessage"]);
+        Assert.Equal("AutoAccepted", result.WorkflowState.Output["ProcessingStatus"]);
+        Assert.Equal("REG-DPC-10-ME-0001-R2", result.WorkflowState.Output["RegistrationReference"]);
+        Assert.Equal(false, result.WorkflowExecutionContext.Input["RequiresReview"]);
+    }
+
+    [Fact]
+    public async Task FlowchartUsesFakeServiceThroughDi_AndPropagatesCancellation()
     {
         var expected = new DocumentRegistrationResult(true, "Fake service accepted the document.", "FAKE-REG-42");
         var fakeService = new RecordingDocumentProcessingService(expected);
@@ -63,29 +89,23 @@ public class DocumentProcessingWorkflowTests
 
         var result = await workflowRunner.RunAsync(
             new DocumentProcessingWorkflow(),
-            new RunWorkflowOptions { Input = CreateInput() },
+            CreateOptions(DocumentNumber, requiresReview: true),
             cancellationToken);
 
         Assert.Equal(1, fakeService.CallCount);
         Assert.Equal(DocumentNumber, fakeService.ReceivedDocumentNumber);
         Assert.Equal(Revision, fakeService.ReceivedRevision);
         Assert.Equal(cancellationToken, fakeService.ReceivedCancellationToken);
-
-        Assert.Equal(WorkflowStatus.Finished, result.WorkflowState.Status);
-        Assert.Equal(WorkflowSubStatus.Finished, result.WorkflowExecutionContext.SubStatus);
-        Assert.Equal("FAKE-REG-42", result.Result);
-        Assert.Equal(true, result.WorkflowState.Output["IsValid"]);
-        Assert.Equal("Fake service accepted the document.", result.WorkflowState.Output["ProcessingMessage"]);
+        AssertSuccessfulBranch(result, "True", "ReviewDocument", "AutoAcceptDocument");
+        Assert.Equal("Reviewed", result.Result);
         Assert.Equal("FAKE-REG-42", result.WorkflowState.Output["RegistrationReference"]);
+        Assert.Equal("Fake service accepted the document.", result.Journal.ActivityExecutionContexts
+            .Single(context => context.Activity is RegisterDocumentActivity)
+            .GetOutputs()["ProcessingMessage"]);
 
-        var registrationContext = result.Journal.ActivityExecutionContexts.Single(context => context.Activity is RegisterDocumentActivity);
-        Assert.Equal("FAKE-REG-42", registrationContext.GetOutputs()["RegistrationReference"]);
-
-        var downstreamContext = result.Journal.ActivityExecutionContexts.Last();
-        var downstreamVariables = downstreamContext.ExpressionExecutionContext;
-        Assert.Equal("FAKE-REG-42", downstreamVariables.GetVariable<string>("RegistrationReference"));
-        Assert.Equal("Fake service accepted the document.", downstreamVariables.GetVariable<string>("ProcessingMessage"));
-        Assert.True(downstreamVariables.GetVariable<bool>("IsValid"));
+        var lastActivityContext = result.Journal.ActivityExecutionContexts.Last();
+        Assert.Equal("FAKE-REG-42", lastActivityContext.ExpressionExecutionContext.GetVariable<string>("RegistrationReference"));
+        Assert.Equal("Fake service accepted the document.", lastActivityContext.ExpressionExecutionContext.GetVariable<string>("ProcessingMessage"));
     }
 
     [Fact]
@@ -105,10 +125,10 @@ public class DocumentProcessingWorkflowTests
 
         var firstResult = await workflowRunner.RunAsync(
             workflowGraph,
-            new RunWorkflowOptions { Input = CreateInput(DocumentNumber) });
+            CreateOptions(DocumentNumber, requiresReview: true));
         var secondResult = await workflowRunner.RunAsync(
             workflowGraph,
-            new RunWorkflowOptions { Input = CreateInput("DPC-10-ME-0002") });
+            CreateOptions("DPC-10-ME-0002", requiresReview: false));
 
         var firstActivity = firstResult.Journal.ActivityExecutionContexts
             .Single(context => context.Activity is RegisterDocumentActivity).Activity;
@@ -118,9 +138,45 @@ public class DocumentProcessingWorkflowTests
         Assert.Same(firstActivity, secondActivity);
         Assert.Equal("REG-DPC-10-ME-0001-R2", firstResult.WorkflowState.Output["RegistrationReference"]);
         Assert.Equal("REG-DPC-10-ME-0002-R2", secondResult.WorkflowState.Output["RegistrationReference"]);
+        Assert.Equal("Reviewed", firstResult.WorkflowState.Output["ProcessingStatus"]);
+        Assert.Equal("AutoAccepted", secondResult.WorkflowState.Output["ProcessingStatus"]);
         Assert.Equal(WorkflowSubStatus.Finished, firstResult.WorkflowExecutionContext.SubStatus);
         Assert.Equal(WorkflowSubStatus.Finished, secondResult.WorkflowExecutionContext.SubStatus);
     }
+
+    private static void AssertSuccessfulBranch(
+        RunWorkflowResult<string> result,
+        string expectedOutcome,
+        string expectedBranch,
+        string skippedBranch)
+    {
+        Assert.Equal(WorkflowStatus.Finished, result.WorkflowState.Status);
+        Assert.Equal(WorkflowSubStatus.Finished, result.WorkflowExecutionContext.SubStatus);
+
+        var contexts = result.Journal.ActivityExecutionContexts;
+        Assert.DoesNotContain(contexts, context => context.Status == ActivityStatus.Faulted);
+
+        var flowchartContext = contexts.Single(context => context.Activity is Flowchart);
+        Assert.Equal(ActivityStatus.Completed, flowchartContext.Status);
+
+        var decisionContext = contexts.Single(context => context.Activity is FlowDecision);
+        Assert.Equal(new[] { expectedOutcome }, Assert.IsType<string[]>(decisionContext.JournalData["Outcomes"]));
+
+        Assert.Contains(contexts, context => context.Activity.Name == expectedBranch);
+        Assert.DoesNotContain(contexts, context => context.Activity.Name == skippedBranch);
+        Assert.Single(contexts, context => context.Activity.Name == "CompleteDocument");
+    }
+
+    private static RunWorkflowOptions CreateOptions(string documentNumber, bool requiresReview) =>
+        new RunWorkflowOptions
+        {
+            Input = new Dictionary<string, object>
+            {
+                ["DocumentNumber"] = documentNumber,
+                ["Revision"] = Revision,
+                ["RequiresReview"] = requiresReview
+            }
+        }.WithCounterBasedFlowchart();
 
     private static void AddWorkflowServices(IServiceCollection services)
     {
@@ -130,12 +186,6 @@ public class DocumentProcessingWorkflowTests
             elsa.AddWorkflow<DocumentProcessingWorkflow>();
         });
     }
-
-    private static IDictionary<string, object> CreateInput(string documentNumber = DocumentNumber) => new Dictionary<string, object>
-    {
-        ["DocumentNumber"] = documentNumber,
-        ["Revision"] = Revision
-    };
 
     private sealed class RecordingDocumentProcessingService(DocumentRegistrationResult result) : IDocumentProcessingService
     {

@@ -1,5 +1,6 @@
 using Elsa.Extensions;
 using Elsa.Workflows;
+using Elsa.Workflows.Activities.Flowchart.Extensions;
 using Elsa.Workflows.Options;
 using ElsaLab.Runner.Activities;
 using ElsaLab.Runner.Services;
@@ -24,16 +25,20 @@ var result = await workflowRunner.RunAsync(
         Input = new Dictionary<string, object>
         {
             ["DocumentNumber"] = "DPC-10-ME-0001",
-            ["Revision"] = 2
+            ["Revision"] = 2,
+            ["RequiresReview"] = true
         }
-    });
+    }.WithCounterBasedFlowchart());
 
-Console.WriteLine("Caller inputs: DocumentNumber=DPC-10-ME-0001, Revision=2");
+Console.WriteLine("Caller inputs: DocumentNumber=DPC-10-ME-0001, Revision=2, RequiresReview=True");
 Console.WriteLine($"Workflow status: {result.WorkflowState.Status}");
-Console.WriteLine($"Typed workflow result: RegistrationReference={result.Result}");
+Console.WriteLine($"Workflow substatus: {result.WorkflowExecutionContext.SubStatus}");
+Console.WriteLine($"Typed workflow result: ProcessingStatus={result.Result}");
 Console.WriteLine(
-    $"Workflow outputs: IsValid={result.WorkflowState.Output["IsValid"]}, " +
-    $"ProcessingMessage={result.WorkflowState.Output["ProcessingMessage"]}, " +
+    $"Workflow outputs: ProcessingStatus={result.WorkflowState.Output["ProcessingStatus"]}, " +
     $"RegistrationReference={result.WorkflowState.Output["RegistrationReference"]}");
 
-return result.WorkflowState.Status == WorkflowStatus.Finished ? 0 : 1;
+return result.WorkflowState.Status == WorkflowStatus.Finished &&
+       result.WorkflowExecutionContext.SubStatus == WorkflowSubStatus.Finished
+    ? 0
+    : 1;
