@@ -60,10 +60,10 @@ The test built one `WorkflowGraph` and ran it twice with different document/revi
 
 ## Limitations
 
-- No bookmark was triggered and no resume API was called. The callback and `AutoComplete` behavior on resume remain untested.
+- This experiment did not trigger a bookmark or call a resume API. The later [ELSA-08 experiment](ELSA-08-external-resume.md) tests exact in-process resume, bookmark consumption, and the no-callback `AutoComplete` behavior.
 - No SQL/EF/database persistence, durable bookmark store, process restart, multi-server host, or recovery path was configured or tested. Returned in-memory state is not evidence of durability.
 - No human-task inbox or external reviewer/vendor event was implemented.
-- The workflow ran through the in-process `IWorkflowRunner`; the experiment does not determine which APIs a production host should use for durable lookup or resume.
+- The workflow ran through the in-process `IWorkflowRunner`; API selection for application-level in-process resume is investigated in ELSA-08. Durable lookup and recovery remain untested.
 - The payload is a small in-memory record. Serialization and compatibility across a process restart were not tested.
 - Cancellation, bookmark deletion, expiration, and multiple bookmarks on one Activity were not tested.
 
