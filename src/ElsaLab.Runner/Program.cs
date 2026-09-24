@@ -4,6 +4,7 @@ using Elsa.Workflows.Activities.Flowchart.Activities;
 using Elsa.Workflows.Activities.Flowchart.Extensions;
 using Elsa.Workflows.Models;
 using Elsa.Workflows.Options;
+using Elsa.Workflows.Runtime;
 using ElsaLab.Runner.Activities;
 using ElsaLab.Runner.Services;
 using ElsaLab.Runner.Workflows;
@@ -38,7 +39,9 @@ services.AddSingleton<IDocumentStorageService, FileSystemDocumentStorageService>
 services.AddElsa(elsa =>
 {
     elsa.AddActivity<MoveDocumentActivity>();
+    elsa.AddActivity<WaitForDocumentReviewActivity>();
     elsa.AddWorkflow<DocumentStorageWorkflow>();
+    elsa.AddWorkflow<DocumentReviewBlockingWorkflow>();
 });
 
 var exitCode = 1;
@@ -97,6 +100,56 @@ try
                File.Exists(destinationPath) &&
                metadata.LogicalLocation == DocumentStorageLocation.Approved &&
                string.Equals(await File.ReadAllTextAsync(destinationPath), fileContents, StringComparison.Ordinal)
+        ? 0
+        : 1;
+
+    Console.WriteLine();
+    Console.WriteLine("ELSA-08 in-process bookmark resume");
+    var workflowBuilder = scope.ServiceProvider.GetRequiredService<IWorkflowBuilderFactory>().CreateBuilder();
+    var blockingWorkflow = await workflowBuilder.BuildWorkflowAsync<DocumentReviewBlockingWorkflow>();
+    await scope.ServiceProvider.GetRequiredService<IWorkflowRegistry>().RegisterAsync(blockingWorkflow);
+    var blockingGraph = await scope.ServiceProvider.GetRequiredService<IWorkflowGraphBuilder>().BuildAsync(blockingWorkflow);
+    var suspended = await workflowRunner.RunAsync(
+        blockingGraph,
+        new RunWorkflowOptions
+        {
+            Input = new Dictionary<string, object>
+            {
+                ["DocumentNumber"] = documentNumber,
+                ["Revision"] = revision,
+                ["ReviewKey"] = "discipline-review",
+                ["ReviewOutcome"] = "Pending",
+                ["Reviewer"] = "Unassigned"
+            }
+        });
+    var waitContext = suspended.Journal.ActivityExecutionContexts.Single(
+        context => context.Activity is WaitForDocumentReviewActivity);
+    var bookmark = suspended.WorkflowState.Bookmarks.Single();
+    Console.WriteLine($"Before resume: status={suspended.WorkflowState.Status}, substatus={suspended.WorkflowExecutionContext.SubStatus}, wait={waitContext.Status}");
+    Console.WriteLine($"Bookmark: id={bookmark.Id}, hash={bookmark.Hash}, activityInstanceId={bookmark.ActivityInstanceId}");
+
+    var resumeResponse = await scope.ServiceProvider.GetRequiredService<IWorkflowResumer>().ResumeAsync(
+        bookmark.Id,
+        new Dictionary<string, object>
+        {
+            ["ReviewOutcome"] = "Approved",
+            ["Reviewer"] = "reviewer-123"
+        },
+        CancellationToken.None);
+    var blockingClient = await scope.ServiceProvider.GetRequiredService<IWorkflowRuntime>()
+        .CreateClientAsync(suspended.WorkflowState.Id);
+    var resumedState = await blockingClient.ExportStateAsync();
+    Console.WriteLine($"After resume: status={resumeResponse?.Status}, substatus={resumeResponse?.SubStatus}, remainingBookmarks={resumedState.Bookmarks.Count}");
+    Console.WriteLine($"Workflow outputs: finalStatus={resumedState.Output["FinalStatus"]}, finalized={resumedState.Output["Finalized"]}");
+    Console.WriteLine($"Resume input observed through workflow inputs: outcome={resumedState.Output["ReviewOutcome"] ?? "<null>"}, reviewer={resumedState.Output["Reviewer"] ?? "<null>"}");
+
+    exitCode = exitCode == 0 &&
+               resumeResponse is not null &&
+               resumeResponse.WorkflowInstanceId == suspended.WorkflowState.Id &&
+               resumeResponse.Status == WorkflowStatus.Finished &&
+               resumeResponse.SubStatus == WorkflowSubStatus.Finished &&
+               resumedState.Bookmarks.Count == 0 &&
+               Equals(resumedState.Output["Finalized"], true)
         ? 0
         : 1;
 }
