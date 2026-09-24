@@ -12,12 +12,15 @@ This is the concise index of verified findings. Each statement is scoped to the 
 - **Observed in ELSA-03:** The custom Activity resolved a scoped application service through `ActivityExecutionContext.GetRequiredService<T>()` and passed it Elsa's `CancellationToken`. A fake service was substituted through normal .NET DI while the real Elsa runtime remained in use. See [ELSA-03](experiments/ELSA-03-custom-activity-di.md) and the [activity/application-service pattern](patterns/activity-application-service.md).
 - **Observed in ELSA-03 and ELSA-04:** Top-level `WorkflowStatus.Finished` alone is insufficient evidence of a successful execution; the tested assertions also check `WorkflowExecutionContext.SubStatus` and faulted activity contexts. See [ELSA-03](experiments/ELSA-03-custom-activity-di.md) and [ELSA-04](experiments/ELSA-04-flowchart-routing.md).
 - **Observed in ELSA-04:** `FlowDecision` records a `True` or `False` outcome; only the selected branch appeared in journal activity contexts, and the two tested routes converged on the shared completion Sequence. See [ELSA-04](experiments/ELSA-04-flowchart-routing.md) and [flowchart routing](reference/flowchart-routing.md).
+- **Observed in ELSA-05:** A token-based `Flowchart` completed a finite revision cycle through an explicit backward connection. Each repeated visit retained the same Activity definition identity but had a distinct activity execution context and ID; workflow variables carried revision and review-round state. See [ELSA-05](experiments/ELSA-05-revision-cycles.md) and [Flowchart cycles](reference/flowchart-cycles.md).
+- **Observed in ELSA-05:** A repeated activity's output was present in each corresponding journal context, while the final workflow output contained the last review summary. The cycle recorded `True`, `True`, `False` decision outcomes and no separate connection activity context. This was tested in token-based mode only. See [ELSA-05](experiments/ELSA-05-revision-cycles.md).
 
 ## Reference guides
 
 - [Workflow data](reference/workflow-data.md)
 - [Activities and dependency injection](reference/activities-and-di.md)
 - [Flowchart routing](reference/flowchart-routing.md)
+- [Flowchart cycles](reference/flowchart-cycles.md)
 - [Activity/application-service pattern](patterns/activity-application-service.md)
 - [Verified Elsa 3.8.4 baseline](versions/elsa-3.8.4.md)
 - [Documentation index and untested coverage](INDEX.md)

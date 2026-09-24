@@ -8,7 +8,7 @@ Status: **TODO**, **IN PROGRESS**, **DONE**, or **BLOCKED**.
 | ELSA-02 | WorkflowBase, Inputs, Outputs and Variables | DONE |
 | ELSA-03 | Custom Activity + Dependency Injection | DONE |
 | ELSA-04 | Flowchart + Conditional Routing | DONE |
-| ELSA-05 | Loops and Revision Cycles | TODO |
+| ELSA-05 | Loops and Revision Cycles | DONE |
 | ELSA-06 | Parallel Execution + Join | TODO |
 | ELSA-07 | Blocking Activity / Bookmark | TODO |
 | ELSA-08 | External Event + Suspend / Resume | TODO |

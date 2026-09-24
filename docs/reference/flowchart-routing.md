@@ -1,6 +1,6 @@
 # Flowchart Routing
 
-This reference summarizes the one Boolean, exclusive-routing graph executed in [ELSA-04](../experiments/ELSA-04-flowchart-routing.md). It does not describe untested loop or parallel semantics.
+This reference summarizes the Boolean, exclusive-routing graph executed in [ELSA-04](../experiments/ELSA-04-flowchart-routing.md). Cyclic execution is summarized separately in [Flowchart cycles](flowchart-cycles.md), based on ELSA-05. Neither page establishes parallel semantics.
 
 ## Tested graph model
 
@@ -24,6 +24,10 @@ Only counter-based execution was selected and tested. The test run pins it with 
 In the tested counter-based mode, Elsa allowed both mutually exclusive outcomes to connect to an ordinary shared target without a `FlowJoin`. Elsa 3.8.4 source describes the implicit `WaitAllActive` handling for such a target; the tagged FlowDecision integration tests also exercise branch convergence.
 
 At runtime, the journal included a completed Flowchart context and a `FlowDecision` context. `JournalData["Outcomes"]` recorded the selected outcome. The selected branch activity appeared and the skipped branch activity did not; the common continuation appeared once. No separate connection execution context appeared in the returned activity-context list. These are observations for this test and execution mode.
+
+## Cyclic execution
+
+ELSA-05 adds a finite cycle using a backward `Connection`, workflow variables, and a `FlowDecision`. It explicitly selects token-based execution because the official 3.8.4 loop integration test uses that mode. The same node appears as multiple execution contexts in the journal while the Flowchart has one context. Details and limitations are in [Flowchart cycles](flowchart-cycles.md); ELSA-05 did not compare cyclic token-based and counter-based execution.
 
 ## Evidence and source
 
