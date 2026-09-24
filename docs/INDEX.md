@@ -21,6 +21,7 @@ Each experiment page records observed behavior, source-confirmed details, infere
 - [ELSA-06 — Parallel Execution + Join](experiments/ELSA-06-parallel-join.md)
 - [ELSA-07 — Blocking Activity / Bookmark](experiments/ELSA-07-blocking-bookmark.md)
 - [ELSA-08 — External Event + Suspend / Resume](experiments/ELSA-08-external-resume.md)
+- [ELSA-09 — SQL Server Persistence](experiments/ELSA-09-sql-server-persistence.md)
 
 ## EDMS Fit Tests
 
@@ -38,6 +39,7 @@ These pages synthesize repeated knowledge and point back to experiments for evid
 - [Flowchart cycles](reference/flowchart-cycles.md)
 - [Parallel execution and join](reference/parallel-and-join.md)
 - [Blocking Activities and Bookmarks](reference/blocking-and-bookmarks.md)
+- [SQL Server persistence](reference/sql-server-persistence.md)
 
 ## Patterns
 
@@ -46,7 +48,7 @@ These pages synthesize repeated knowledge and point back to experiments for evid
 ## Version Notes
 
 - [Elsa 3.8.4 baseline](versions/elsa-3.8.4.md)
-- All eight completed experiments were verified against Elsa 3.8.4 and .NET 10 (`net10.0`). Re-run relevant experiments before relying on these findings after an Elsa upgrade.
+- All nine completed experiments were verified against Elsa 3.8.4 and .NET 10 (`net10.0`). Re-run relevant experiments before relying on these findings after an Elsa upgrade.
 
 ## Current Knowledge Coverage
 
@@ -61,9 +63,10 @@ These pages synthesize repeated knowledge and point back to experiments for evid
 | Blocking Activity / bookmark creation and suspended in-memory state | ELSA-07 |
 | Exact bookmark-ID resume through Elsa's in-process runtime | ELSA-08 |
 | AutoBurn consumption, no-callback AutoComplete, duplicate exact resume, and instance isolation | ELSA-08 |
+| SQL Server persistence for suspended instances and bookmarks; fresh-provider rehydration/resume | ELSA-09 |
 | Stimulus-based bookmark matching / correlation | Not yet tested |
 | Resume-time data consumed through workflow inputs | Not verified in the tested `IWorkflowResumer` code-first path (ELSA-08) |
-| Persistence | Not yet tested (ELSA-09) |
+| SQL persistence across fresh DI/runtime reconstruction | ELSA-09 |
 | Process restart and resume | Not yet tested (ELSA-10) |
 | Timers, delay, SLA, and escalation | Not yet tested (ELSA-11) |
 | Failure handling and retry | Not yet tested (ELSA-12) |

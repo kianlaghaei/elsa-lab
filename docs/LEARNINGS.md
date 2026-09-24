@@ -23,6 +23,9 @@ This is the concise index of verified findings. Each statement is scoped to the 
 - **Observed in ELSA-08:** A no-callback bookmark with `AutoComplete=true` led the wait Activity to `Completed` and scheduled its downstream Sequence. The resumed Activity execution context was a new CLR object with the same ID; the observed `ExecutionCount` was 1 again. See [ELSA-08](experiments/ELSA-08-external-resume.md).
 - **Observed in ELSA-08:** `IWorkflowResumer` responses did not include output in the tested exact-ID call; named outputs were visible through `IWorkflowRuntime.CreateClientAsync(...).ExportStateAsync()`. Resume input values were null through downstream workflow `GetInput<T>` in this registered code-first runtime path, while direct `IWorkflowRunner` continuation consumed them. Do not assume those two paths transport resume input identically. See [ELSA-08](experiments/ELSA-08-external-resume.md).
 - **Observed in ELSA-08:** Resuming one of two suspended workflow instances left the other instance suspended with its own stored bookmark. Bookmark IDs and stored owner workflow IDs were distinct. See [ELSA-08](experiments/ELSA-08-external-resume.md).
+- **Observed in ELSA-09:** Elsa's SQL Server management provider persisted workflow definitions/instances and workflow state, while the runtime provider persisted bookmarks. A fresh service provider loaded and resumed the suspended instance, and the bookmark disappeared from SQL after `AutoBurn`. This verifies provider reconstruction in one process, not process restart. See [ELSA-09](experiments/ELSA-09-sql-server-persistence.md) and [SQL Server persistence](reference/sql-server-persistence.md).
+- **Observed in ELSA-09:** A persisted bookmark's `DocumentReviewBookmarkPayload` values survived, but its Host B CLR type was `ExpandoObject`. A persisted definition row did not alone materialize the compiled code-first graph; registering the workflow through `IWorkflowRegistry` in the new provider enabled resume. See [ELSA-09](experiments/ELSA-09-sql-server-persistence.md).
+- **Observed in ELSA-09:** Two suspended instances persisted independently; resuming one from Host B consumed only its bookmark and left the other suspended until separately resumed. The test used the persisted bookmark payload for continuation and did not depend on `IWorkflowResumer` resume-time inputs. Process restart remains untested. See [ELSA-09](experiments/ELSA-09-sql-server-persistence.md).
 
 ## EDMS fit-test findings
 
@@ -38,6 +41,7 @@ This is the concise index of verified findings. Each statement is scoped to the 
 - [Flowchart cycles](reference/flowchart-cycles.md)
 - [Parallel execution and join](reference/parallel-and-join.md)
 - [Blocking Activities and Bookmarks](reference/blocking-and-bookmarks.md)
+- [SQL Server persistence](reference/sql-server-persistence.md)
 - [Activity/application-service pattern](patterns/activity-application-service.md)
 - [Verified Elsa 3.8.4 baseline](versions/elsa-3.8.4.md)
 - [Documentation index and untested coverage](INDEX.md)

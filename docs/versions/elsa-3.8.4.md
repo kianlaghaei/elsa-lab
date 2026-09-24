@@ -20,6 +20,7 @@ The runner uses Elsa's `Elsa` bundle package at 3.8.4. The project does not conf
 | ELSA-06 — Parallel Execution + Join | [`47c152954945dce32b75ec3df77443c043653c09`](https://github.com/kianlaghaei/elsa-lab/commit/47c152954945dce32b75ec3df77443c043653c09) | [Experiment record](../experiments/ELSA-06-parallel-join.md) |
 | ELSA-07 — Blocking Activity / Bookmark | [`84b1aae1ca41cfa3f12e19569fd5679d9079b8cb`](https://github.com/kianlaghaei/elsa-lab/commit/84b1aae1ca41cfa3f12e19569fd5679d9079b8cb) | [Experiment record](../experiments/ELSA-07-blocking-bookmark.md) |
 | ELSA-08 — External Event + Suspend / Resume | [`164256325697f1ca5b9db2e220cf4016715bbd53`](https://github.com/kianlaghaei/elsa-lab/commit/164256325697f1ca5b9db2e220cf4016715bbd53) | [Experiment record](../experiments/ELSA-08-external-resume.md) |
+| ELSA-09 — SQL Server Persistence | [`817c3fbc62da4e573bb6722ab1a265008a604dd8`](https://github.com/kianlaghaei/elsa-lab/commit/817c3fbc62da4e573bb6722ab1a265008a604dd8) | [Experiment record](../experiments/ELSA-09-sql-server-persistence.md) |
 
 ## Upgrade rule
 

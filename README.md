@@ -11,7 +11,7 @@ ElsaLab is an experimental, code-first repository for learning Elsa Workflows th
 
 ## Current progress
 
-ELSA-01 through ELSA-08 are verified against Elsa 3.8.4 and .NET 10. ELSA-09 and later remain TODO in the [roadmap](ROADMAP.md).
+ELSA-01 through ELSA-09 are verified against Elsa 3.8.4 and .NET 10. ELSA-10 and later remain TODO in the [roadmap](ROADMAP.md). ELSA-09 verifies SQL-backed suspended workflow/bookmark rehydration across fresh providers; process restart remains untested.
 
 ## Knowledge model
 
@@ -50,3 +50,14 @@ dotnet run --project src/ElsaLab.Runner/ElsaLab.Runner.csproj
 ```
 
 The runner demonstrates EDMS-FIT-01: an Elsa `FlowDecision` selects an approved document route, and a thin Activity calls the storage service to move a temporary sample file and update metadata. It then starts the ELSA-08 review workflow, shows its suspended bookmark, resumes that exact bookmark through `IWorkflowResumer`, and prints the resulting workflow state. The storage example creates and cleans its data under the system temporary directory. See [EDMS-FIT-01](docs/fit-tests/EDMS-FIT-01-document-storage.md) and [ELSA-08](docs/experiments/ELSA-08-external-resume.md) for evidence and limitations.
+
+## SQL Server integration tests
+
+The ELSA-09 tests use a dedicated SQL Server connection from `ELSALAB_SQLSERVER_CONNECTION_STRING`. They create and remove uniquely named `ElsaLab_<guid>` test databases, so the configured test identity must have database create/drop permissions. No connection string or credentials belong in source control. Configure a local or dedicated test-server connection in your shell and run:
+
+```powershell
+$env:ELSALAB_SQLSERVER_CONNECTION_STRING = "Server=<sql-server>;Initial Catalog=master;Integrated Security=True;TrustServerCertificate=True;Encrypt=False"
+dotnet test tests/ElsaLab.Tests/ElsaLab.Tests.csproj --filter Category=SqlServer
+```
+
+When the environment variable is absent, the SQL integration tests are skipped and the in-memory suite remains runnable. See [ELSA-09](docs/experiments/ELSA-09-sql-server-persistence.md) for configuration and persistence findings.
