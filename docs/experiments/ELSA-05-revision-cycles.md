@@ -7,7 +7,7 @@
 | Elsa | 3.8.4 |
 | .NET | 10 (`net10.0`) |
 | Verified date | 2026-09-24 |
-| Implementation commit | Recorded as the feature commit in the follow-up documentation commit |
+| Implementation commit | [`35fe9f8232277bf930c77cc5e47a10509d3e03ed`](https://github.com/kianlaghaei/elsa-lab/commit/35fe9f8232277bf930c77cc5e47a10509d3e03ed) |
 
 ## Observed
 
