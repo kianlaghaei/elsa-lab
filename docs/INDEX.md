@@ -21,6 +21,12 @@ Each experiment page records observed behavior, source-confirmed details, infere
 - [ELSA-06 — Parallel Execution + Join](experiments/ELSA-06-parallel-join.md)
 - [ELSA-07 — Blocking Activity / Bookmark](experiments/ELSA-07-blocking-bookmark.md)
 
+## EDMS Fit Tests
+
+These separate fit tests evaluate whether already-tested Elsa patterns fit future EDMS application boundaries. They are not numbered Elsa roadmap milestones.
+
+- [EDMS-FIT-01 — Document Storage and Workflow Side Effects](fit-tests/EDMS-FIT-01-document-storage.md) — physical-move adapter, service-owned file semantics, metadata, and idempotency.
+
 ## Reference
 
 These pages synthesize repeated knowledge and point back to experiments for evidence.

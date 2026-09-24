@@ -34,6 +34,7 @@ The experiment pages preserve the version, implementation commit, limitations, a
 - [Documentation index](docs/INDEX.md)
 - [Roadmap](ROADMAP.md)
 - [Concise learnings](docs/LEARNINGS.md)
+- [EDMS storage fit test](docs/fit-tests/EDMS-FIT-01-document-storage.md)
 - [Automated tests](tests/ElsaLab.Tests/)
 - [Current runner](src/ElsaLab.Runner/Program.cs)
 
@@ -48,4 +49,4 @@ dotnet test
 dotnet run --project src/ElsaLab.Runner/ElsaLab.Runner.csproj
 ```
 
-The runner demonstrates a document review workflow that reaches an Elsa bookmark and returns in a suspended state for document `DPC-10-ME-0001`. It does not resume the bookmark. See [ELSA-07](docs/experiments/ELSA-07-blocking-bookmark.md) for the observed blocking state and boundaries.
+The runner demonstrates EDMS-FIT-01: an Elsa `FlowDecision` selects an approved document route, and a thin Activity calls the storage service to move a temporary sample file and update metadata. The runner creates and cleans its data under the system temporary directory. See [EDMS-FIT-01](docs/fit-tests/EDMS-FIT-01-document-storage.md) for assertions, idempotency findings, and production limitations. The numbered Elsa roadmap is unchanged; ELSA-08 remains TODO.

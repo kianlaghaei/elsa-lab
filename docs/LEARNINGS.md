@@ -20,6 +20,12 @@ This is the concise index of verified findings. Each statement is scoped to the 
 - **Observed in ELSA-07:** The bookmark appears in `WorkflowExecutionContext.Bookmarks`, `WorkflowState.Bookmarks`, and the owning `ActivityExecutionContext.Bookmarks`; it is not a separate activity journal context, and the wait Activity's `JournalData` was empty. Reusing one graph retained Activity definition identity while giving each run separate workflow/execution/bookmark IDs and payload state. See [ELSA-07](experiments/ELSA-07-blocking-bookmark.md).
 - **Source-confirmed and explicitly handled in ELSA-07:** When creating with `CreateBookmarkArgs`, `IncludeActivityInstanceId` defaults to false; the experiment sets it to true so it participates in the bookmark hash. No resume, durable storage, or restart behavior was tested. See [ELSA-07](experiments/ELSA-07-blocking-bookmark.md).
 
+## EDMS fit-test findings
+
+- **Observed in EDMS-FIT-01:** Elsa's `FlowDecision` selected one storage route and a thin custom `CodeActivity` called `IDocumentStorageService`; the service moved the test file and updated metadata. The workflow published the service result and finished without faulted Activity contexts. See [EDMS-FIT-01](fit-tests/EDMS-FIT-01-document-storage.md).
+- **Observed in EDMS-FIT-01:** Running the same graph and operation identity twice invoked the storage service twice. The application service returned `Applied` then `AlreadyApplied`, retained one logical operation and unchanged bytes, and rejected reuse of that key for another destination. Elsa did not deduplicate the external side effect. See [EDMS-FIT-01](fit-tests/EDMS-FIT-01-document-storage.md).
+- **Production implication from EDMS-FIT-01:** Keep file semantics, safe logical-location mapping, metadata, and side-effect idempotency in the EDMS service. Consider stable immutable binary keys with database metadata transitions; a physical move and database update are not one transaction. See [EDMS-FIT-01](fit-tests/EDMS-FIT-01-document-storage.md).
+
 ## Reference guides
 
 - [Workflow data](reference/workflow-data.md)
