@@ -2,11 +2,11 @@
 
 ElsaLab is a separate experimental repository for learning and evaluating Elsa Workflows 3 as natively as possible for future EDMS and FLOREX use. It is not a production application or a custom workflow engine.
 
-The work is incremental. Only **ELSA-01 — Basic Code-First Execution** is implemented. See [ROADMAP.md](ROADMAP.md) and [docs/LEARNINGS.md](docs/LEARNINGS.md) for its status and observed results.
+The work is incremental. **ELSA-01 — Basic Code-First Execution**, **ELSA-02 — WorkflowBase, Inputs, Outputs and Variables**, and **ELSA-03 — Custom Activity + Dependency Injection** are complete. See [ROADMAP.md](ROADMAP.md) and [docs/LEARNINGS.md](docs/LEARNINGS.md) for their status and observed results.
 
-## ELSA-01: Basic Code-First Execution
+## ELSA-03: Custom Activity + Dependency Injection
 
-`DocumentReceivedWorkflow` derives from Elsa's `WorkflowBase` and sets its root to a `Sequence` containing two native `WriteLine` activities. The runner registers Elsa and the workflow in `Microsoft.Extensions.DependencyInjection`, resolves Elsa's `IWorkflowRunner`, runs the workflow, and inspects `WorkflowState.Status`.
+`DocumentProcessingWorkflow` passes typed workflow inputs to the custom `RegisterDocumentActivity`. The activity delegates registration to the scoped `IDocumentProcessingService`, publishes native Elsa outputs, and the later workflow steps capture and expose those values. The runner resolves Elsa's scoped `IWorkflowRunner` from a DI scope and inspects the final state, outputs, and typed workflow result.
 
 ## Run the experiment
 
@@ -15,16 +15,18 @@ From the repository root:
 ```powershell
 dotnet restore
 dotnet build
-dotnet run --project src/ElsaLab.Runner/ElsaLab.Runner.csproj
 dotnet test
+dotnet run --project src/ElsaLab.Runner/ElsaLab.Runner.csproj
 ```
 
 Expected console output:
 
 ```text
-Document received
-Document processing started
+Downstream step consumed registration output: DocumentNumber=DPC-10-ME-0001, Revision=2, IsValid=True, RegistrationReference=REG-DPC-10-ME-0001-R2, ProcessingMessage=Registered DPC-10-ME-0001, revision 2.
+Caller inputs: DocumentNumber=DPC-10-ME-0001, Revision=2
 Workflow status: Finished
+Typed workflow result: RegistrationReference=REG-DPC-10-ME-0001-R2
+Workflow outputs: IsValid=True, ProcessingMessage=Registered DPC-10-ME-0001, revision 2., RegistrationReference=REG-DPC-10-ME-0001-R2
 ```
 
 ## Structure
@@ -32,7 +34,9 @@ Workflow status: Finished
 ```text
 ElsaLab.slnx
 src/ElsaLab.Runner/       Console runner and code-first workflow
-tests/ElsaLab.Tests/      xUnit integration test
+src/ElsaLab.Runner/Activities/  Custom Elsa activities
+src/ElsaLab.Runner/Services/   Application service and result
+tests/ElsaLab.Tests/      xUnit runtime integration tests
 ROADMAP.md                Learning milestones
 docs/LEARNINGS.md          Observations from completed experiments
 ```
@@ -47,4 +51,4 @@ The bundle is used because Elsa's official console setup uses `AddElsa()`. No wo
 
 ## Scope
 
-Use Elsa APIs directly and keep each experiment small enough to understand. Add application/domain services only when a later experiment needs real business logic. Do not add Studio, a designer, a custom workflow abstraction, or persistence until the roadmap reaches the relevant experiment.
+Use Elsa APIs directly and keep each experiment small enough to understand. Keep business behavior in normal application services and custom Elsa activities thin. Do not add Studio, a designer, persistence, or later roadmap capabilities before their experiments.

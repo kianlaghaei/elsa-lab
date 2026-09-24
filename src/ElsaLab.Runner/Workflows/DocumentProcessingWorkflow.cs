@@ -2,6 +2,7 @@ using Elsa.Extensions;
 using Elsa.Workflows;
 using Elsa.Workflows.Activities;
 using Elsa.Workflows.Management.Activities.SetOutput;
+using ElsaLab.Runner.Activities;
 
 namespace ElsaLab.Runner.Workflows;
 
@@ -11,39 +12,54 @@ public class DocumentProcessingWorkflow : WorkflowBase<string>
     {
         var documentNumberInput = builder.WithInput<string>("DocumentNumber");
         var revisionInput = builder.WithInput<int>("Revision");
-        var requiresReviewInput = builder.WithInput<bool>("RequiresReview");
-        builder.WithOutput<string>("ProcessingStatus");
+        builder.WithOutput<bool>("IsValid");
+        builder.WithOutput<string>("ProcessingMessage");
+        builder.WithOutput<string>("RegistrationReference");
 
-        var processingStatus = builder.WithVariable<string>("ProcessingStatus", "Received");
-        var stepCount = builder.WithVariable<int>("StepCount", 0);
+        var isValid = builder.WithVariable<bool>("IsValid", false);
+        var processingMessage = builder.WithVariable<string>("ProcessingMessage", string.Empty);
+        var registrationReference = builder.WithVariable<string>("RegistrationReference", string.Empty);
+
+        var registerDocument = new RegisterDocumentActivity
+        {
+            DocumentNumber = new(context => context.GetInput<string>(documentNumberInput)!),
+            Revision = new(context => context.GetInput<int>(revisionInput))
+        };
 
         builder.Root = new Sequence
         {
             Activities =
             {
+                registerDocument,
+                new SetVariable<bool>(isValid, context =>
+                    registerDocument.GetOutput<bool>(context.GetActivityExecutionContext()!, nameof(RegisterDocumentActivity.IsValid))!),
+                new SetVariable<string>(processingMessage, context =>
+                    registerDocument.GetOutput<string>(context.GetActivityExecutionContext()!, nameof(RegisterDocumentActivity.ProcessingMessage))!),
+                new SetVariable<string>(registrationReference, context =>
+                    registerDocument.GetOutput<string>(context.GetActivityExecutionContext()!, nameof(RegisterDocumentActivity.RegistrationReference))!),
                 new WriteLine(context =>
-                    $"Inputs read: DocumentNumber={context.GetInput<string>(documentNumberInput)}, " +
+                    $"Downstream step consumed registration output: " +
+                    $"DocumentNumber={context.GetInput<string>(documentNumberInput)}, " +
                     $"Revision={context.GetInput<int>(revisionInput)}, " +
-                    $"RequiresReview={context.GetInput<bool>(requiresReviewInput)}"),
-                new SetVariable<string>(processingStatus, context =>
-                    $"Processing {context.GetInput<string>(documentNumberInput)} revision {context.GetInput<int>(revisionInput)}"),
-                new SetVariable<int>(stepCount, context => stepCount.Get(context)! + 1),
-                new SetVariable<string>(processingStatus, context =>
-                    $"Processed {context.GetInput<string>(documentNumberInput)} revision {context.GetInput<int>(revisionInput)}"),
-                new SetVariable<int>(stepCount, context => stepCount.Get(context)! + 1),
+                    $"IsValid={isValid.Get(context)}, " +
+                    $"RegistrationReference={registrationReference.Get(context)}, " +
+                    $"ProcessingMessage={processingMessage.Get(context)}"),
                 new SetOutput
                 {
-                    OutputName = new("ProcessingStatus"),
-                    OutputValue = new(context => processingStatus.Get(context)!)
+                    OutputName = new("IsValid"),
+                    OutputValue = new(context => isValid.Get(context))
                 },
-                new WriteLine(context =>
-                    $"Later step observed: ProcessingStatus={processingStatus.Get(context)}, " +
-                    $"StepCount={stepCount.Get(context)}, " +
-                    $"RequiresReview={context.GetInput<bool>(requiresReviewInput)}"),
-                new SetVariable<string>(Result, context =>
-                    $"{processingStatus.Get(context)}; " +
-                    $"RequiresReview={context.GetInput<bool>(requiresReviewInput)}; " +
-                    $"StepCount={stepCount.Get(context)}")
+                new SetOutput
+                {
+                    OutputName = new("ProcessingMessage"),
+                    OutputValue = new(context => processingMessage.Get(context)!)
+                },
+                new SetOutput
+                {
+                    OutputName = new("RegistrationReference"),
+                    OutputValue = new(context => registrationReference.Get(context)!)
+                },
+                new SetVariable<string>(Result, context => registrationReference.Get(context)!)
             }
         };
     }

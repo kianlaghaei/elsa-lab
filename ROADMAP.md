@@ -6,7 +6,7 @@ Status: **TODO**, **IN PROGRESS**, **DONE**, or **BLOCKED**.
 |---|---|---|
 | ELSA-01 | Basic Code-First Execution | DONE |
 | ELSA-02 | WorkflowBase, Inputs, Outputs and Variables | DONE |
-| ELSA-03 | Custom Activity + Dependency Injection | TODO |
+| ELSA-03 | Custom Activity + Dependency Injection | DONE |
 | ELSA-04 | Flowchart + Conditional Routing | TODO |
 | ELSA-05 | Loops and Revision Cycles | TODO |
 | ELSA-06 | Parallel Execution + Join | TODO |
