@@ -24,4 +24,6 @@ Status: **TODO**, **IN PROGRESS**, **DONE**, or **BLOCKED**.
 | ELSA-18 | Load / Concurrency Experiment | TODO |
 | ELSA-19 | EDMS-Like End-to-End Workflow | TODO |
 
+Each completed experiment should produce a working implementation, automated evidence, an experiment record, and an update to the knowledge base. See [docs/INDEX.md](docs/INDEX.md) for verified coverage and topics not yet tested.
+
 ELSA-19 is the eventual destination. Do not start it before the preceding capabilities have been explored independently.

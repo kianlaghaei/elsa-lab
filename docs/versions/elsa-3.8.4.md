@@ -1,0 +1,22 @@
+# Elsa 3.8.4 Verification Baseline
+
+| Item | Verified value |
+|---|---|
+| Elsa version | 3.8.4 |
+| Target framework | .NET 10 (`net10.0`) |
+| Primary package | `Elsa` 3.8.4 |
+
+The runner uses Elsa's `Elsa` bundle package at 3.8.4. The project does not configure Elsa Server API endpoints, Studio, or a Designer.
+
+## Experiments verified against this baseline
+
+| Experiment | Implementation commit | Knowledge page |
+|---|---|---|
+| ELSA-01 — Basic Code-First Execution | [`b27d78f6aa1222b96f2ccd073d3aa8e617ae6c8c`](https://github.com/kianlaghaei/elsa-lab/commit/b27d78f6aa1222b96f2ccd073d3aa8e617ae6c8c) | [Experiment record](../experiments/ELSA-01-basic-execution.md) |
+| ELSA-02 — Workflow Data | [`e4517859c1567b16c4bdfd4a330b62c194fcbc27`](https://github.com/kianlaghaei/elsa-lab/commit/e4517859c1567b16c4bdfd4a330b62c194fcbc27) | [Experiment record](../experiments/ELSA-02-data-model.md) |
+| ELSA-03 — Custom Activity + DI | [`bf50d68bfde14ba0a51a73a5ff134b4bc878148c`](https://github.com/kianlaghaei/elsa-lab/commit/bf50d68bfde14ba0a51a73a5ff134b4bc878148c) | [Experiment record](../experiments/ELSA-03-custom-activity-di.md) |
+| ELSA-04 — Flowchart Routing | [`24f7d2554b9259806896b9e36c94c62241769f9b`](https://github.com/kianlaghaei/elsa-lab/commit/24f7d2554b9259806896b9e36c94c62241769f9b) | [Experiment record](../experiments/ELSA-04-flowchart-routing.md) |
+
+## Upgrade rule
+
+These findings were observed or checked against Elsa 3.8.4 on .NET 10. When Elsa is upgraded, rerun the relevant experiments and inspect the new version's source before relying on these conclusions. No forward compatibility is claimed by this baseline.
