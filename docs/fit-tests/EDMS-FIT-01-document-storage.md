@@ -7,7 +7,7 @@
 | Elsa | 3.8.4 |
 | .NET | 10 (`net10.0`) |
 | Verified date | 2026-09-24 |
-| Implementation commit | Pending feature commit |
+| Implementation commit | [`795b51ed4410147eeae07521cb57a13e56d3463f`](https://github.com/kianlaghaei/elsa-lab/commit/795b51ed4410147eeae07521cb57a13e56d3463f) |
 
 This is an EDMS architecture fit test, separate from the numbered Elsa roadmap. It uses physical movement in an isolated temporary directory to check the orchestration boundary; it is not a production storage design.
 
