@@ -152,6 +152,9 @@ try
                Equals(resumedState.Output["Finalized"], true)
         ? 0
         : 1;
+
+    Console.WriteLine();
+    exitCode = await DocumentPublicationDemo.RunAsync() && exitCode == 0 ? 0 : 1;
 }
 finally
 {

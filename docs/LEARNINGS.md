@@ -33,6 +33,11 @@ This is the concise index of verified findings. Each statement is scoped to the 
 - **Observed in ELSA-11:** A fresh process restored a committed future timer, and another process restored an overdue timer after Process A was killed only after SQL confirmed persistence. Elsa's local scheduler plus startup bookmark restoration sufficed; clustered scheduling was not tested. See [ELSA-11](experiments/ELSA-11-sla-timers-escalation.md).
 - **Observed in ELSA-11:** In the tested `While` / `Fork` race, `Event("ReviewCompleted")` followed by Elsa `Break` cancelled the Delay bookmark. The workflow finished OnTime with no reminder/escalation, including after the original deadline passed while the runtime remained alive. See [ELSA-11](experiments/ELSA-11-sla-timers-escalation.md).
 - **Observed in ELSA-11:** Activity operation IDs made the sample action service idempotent for identical commands and rejected conflicting key reuse. The service was in memory, so durable cross-process side-effect idempotency remains an application responsibility. See [ELSA-11](experiments/ELSA-11-sla-timers-escalation.md) and [ELSA-11 source](../src/ElsaLab.Runner/Services/ReviewSlaActionService.cs).
+- **Observed in ELSA-12:** `IResilientActivityInvoker` ran the configured Polly strategy for a custom `IResilientActivity`. With two configured retries, two transient failures then success made three service calls and produced two attempt records; a classified permanent exception was called once. The policy must explicitly consult/classify with `ITransientExceptionDetector`; adding an `ITransientExceptionStrategy` alone does not automatically retry an Activity. See [ELSA-12](experiments/ELSA-12-failure-retry-incidents.md) and [failure/retry reference](reference/failure-retry-incidents.md).
+- **Observed in ELSA-12:** Retry attempt records were persisted in successful Activity execution records and survived a fresh SQL provider. On retry exhaustion the invoker threw before calling its recorder, so the normal reader returned no attempt history for the exhausted call sequence. See [ELSA-12](experiments/ELSA-12-failure-retry-incidents.md).
+- **Observed in ELSA-12:** The tested host default resolved to `FaultStrategy`; it returned `Finished` / `Faulted`, retained an Activity incident, and did not run downstream work. With `ContinueWithIncidentsStrategy`, the tested linear Sequence returned `Running` / `Suspended`, kept the incident, had no bookmark, and also did not run downstream work. See [ELSA-12](experiments/ELSA-12-failure-retry-incidents.md).
+- **Observed in ELSA-12:** A fault incident survived SQL persistence and a real OS process exit. Its Activity ID and message survived, but the custom exception `Type` rehydrated as `System.Exception` in the tested SQL provider path. See [ELSA-12](experiments/ELSA-12-failure-retry-incidents.md).
+- **Observed in ELSA-12 and EDMS-FIT-01:** Elsa retry repeated the Activity/service call. An apply-then-throw retry was safe only because the application service recognized the same operation ID as already applied; reusing that key for a materially different command was rejected. Elsa does not provide exactly-once behavior for arbitrary external side effects. See [ELSA-12](experiments/ELSA-12-failure-retry-incidents.md) and [EDMS-FIT-01](fit-tests/EDMS-FIT-01-document-storage.md).
 
 ## EDMS fit-test findings
 
@@ -51,6 +56,7 @@ This is the concise index of verified findings. Each statement is scoped to the 
 - [SQL Server persistence](reference/sql-server-persistence.md)
 - [Process restart recovery](reference/restart-recovery.md)
 - [Timers and SLA](reference/timers-and-sla.md)
+- [Failure, retry and incidents](reference/failure-retry-incidents.md)
 - [Activity/application-service pattern](patterns/activity-application-service.md)
 - [Verified Elsa 3.8.4 baseline](versions/elsa-3.8.4.md)
 - [Documentation index and untested coverage](INDEX.md)

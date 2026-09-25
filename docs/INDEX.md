@@ -24,6 +24,7 @@ Each experiment page records observed behavior, source-confirmed details, infere
 - [ELSA-09 — SQL Server Persistence](experiments/ELSA-09-sql-server-persistence.md)
 - [ELSA-10 — Process Kill + Restart + Resume](experiments/ELSA-10-process-restart-recovery.md)
 - [ELSA-11 — Timers / Delay / SLA / Escalation](experiments/ELSA-11-sla-timers-escalation.md)
+- [ELSA-12 — Failure Handling + Retry](experiments/ELSA-12-failure-retry-incidents.md)
 
 ## EDMS Fit Tests
 
@@ -44,6 +45,7 @@ These pages synthesize repeated knowledge and point back to experiments for evid
 - [SQL Server persistence](reference/sql-server-persistence.md)
 - [Process restart recovery](reference/restart-recovery.md)
 - [Timers and SLA](reference/timers-and-sla.md)
+- [Failure, retry and incidents](reference/failure-retry-incidents.md)
 
 ## Patterns
 
@@ -52,7 +54,7 @@ These pages synthesize repeated knowledge and point back to experiments for evid
 ## Version Notes
 
 - [Elsa 3.8.4 baseline](versions/elsa-3.8.4.md)
-- All eleven completed experiments were verified against Elsa 3.8.4 and .NET 10 (`net10.0`). Re-run relevant experiments before relying on these findings after an Elsa upgrade.
+- All twelve completed experiments were verified against Elsa 3.8.4 and .NET 10 (`net10.0`). Re-run relevant experiments before relying on these findings after an Elsa upgrade.
 
 ## Current Knowledge Coverage
 
@@ -71,6 +73,12 @@ These pages synthesize repeated knowledge and point back to experiments for evid
 | Process exit/kill after a committed suspension, fresh-process reload, and exact bookmark resume | ELSA-10 |
 | Durable `Delay` bookmark in SQL and overdue timer restored after single-node process restart | ELSA-11 |
 | Reminder/escalation sequence and early review completion cancelling the tested timer branch | ELSA-11 |
+| Polly retry policy for a resilient Activity; transient vs permanent exception classification | ELSA-12 |
+| Successful retry-attempt recording and SQL round trip; exhausted-attempt recorder boundary | ELSA-12 |
+| FaultStrategy, ContinueWithIncidentsStrategy and persisted incident behavior | ELSA-12 |
+| Side-effect retry safety with application idempotency and conflicting operation-key rejection | ELSA-12; EDMS-FIT-01 |
+| Faulted workflow incident survives SQL reload and actual process exit | ELSA-12 |
+| Manual alteration retry and recovery from an interrupted active Activity | Not verified |
 | Clustered scheduling ownership and distributed timer delivery | Not verified |
 | Interrupted active Activity recovery | Not verified |
 | Distributed/multi-node recovery and concurrent resume ownership | Not verified |
@@ -78,7 +86,7 @@ These pages synthesize repeated knowledge and point back to experiments for evid
 | Resume-time data consumed through workflow inputs | Not verified in the tested `IWorkflowResumer` code-first path (ELSA-08) |
 | SQL persistence across fresh DI/runtime reconstruction | ELSA-09 |
 | Timers, delay, SLA, and escalation | ELSA-11 |
-| Failure handling and retry | Not yet tested (ELSA-12) |
+| Failure handling and retry | ELSA-12 |
 | Workflow versioning | Not yet tested (ELSA-13) |
 | End-to-end workflow cancellation/interruption lifecycle | Not yet tested (ELSA-14); token propagation to a service was tested in ELSA-03 |
 | Broad execution history/audit/observability | Not yet tested (ELSA-15); selected in-process journal fields were inspected in ELSA-02 through ELSA-04 |
