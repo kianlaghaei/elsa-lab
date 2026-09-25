@@ -25,7 +25,7 @@ The runner uses Elsa's `Elsa` bundle package at 3.8.4. The project does not conf
 | ELSA-09 — SQL Server Persistence | [`817c3fbc62da4e573bb6722ab1a265008a604dd8`](https://github.com/kianlaghaei/elsa-lab/commit/817c3fbc62da4e573bb6722ab1a265008a604dd8) | [Experiment record](../experiments/ELSA-09-sql-server-persistence.md) |
 | ELSA-10 — Process Kill + Restart + Resume | [`0a96a5be0e15204c8aa6a7bd98bf8714910bd6d1`](https://github.com/kianlaghaei/elsa-lab/commit/0a96a5be0e15204c8aa6a7bd98bf8714910bd6d1) | [Experiment record](../experiments/ELSA-10-process-restart-recovery.md) |
 | ELSA-11 — Timers / Delay / SLA / Escalation | [`3d475607e78ae3b1483ebac8bc9fccd6e5d9a869`](https://github.com/kianlaghaei/elsa-lab/commit/3d475607e78ae3b1483ebac8bc9fccd6e5d9a869) | [Experiment record](../experiments/ELSA-11-sla-timers-escalation.md) |
-| ELSA-12 — Failure Handling + Retry | pending feature commit | [Experiment record](../experiments/ELSA-12-failure-retry-incidents.md) |
+| ELSA-12 — Failure Handling + Retry | [`ca6d2e16d24bb2d68d0644e3b58755d58a69de48`](https://github.com/kianlaghaei/elsa-lab/commit/ca6d2e16d24bb2d68d0644e3b58755d58a69de48) | [Experiment record](../experiments/ELSA-12-failure-retry-incidents.md) |
 
 ## Upgrade rule
 
