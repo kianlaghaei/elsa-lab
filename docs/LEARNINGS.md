@@ -50,6 +50,18 @@ This is the concise index of verified findings. Each statement is scoped to the 
 - **Observed in EDMS-FIT-01:** Running the same graph and operation identity twice invoked the storage service twice. The application service returned `Applied` then `AlreadyApplied`, retained one logical operation and unchanged bytes, and rejected reuse of that key for another destination. Elsa did not deduplicate the external side effect. See [EDMS-FIT-01](fit-tests/EDMS-FIT-01-document-storage.md).
 - **Production implication from EDMS-FIT-01:** Keep file semantics, safe logical-location mapping, metadata, and side-effect idempotency in the EDMS service. Consider stable immutable binary keys with database metadata transitions; a physical move and database update are not one transaction. See [EDMS-FIT-01](fit-tests/EDMS-FIT-01-document-storage.md).
 
+## Architecture-gate findings
+
+- **Confirmed from the Elsa 3.8.4 tagged source:** the tag supplies RunTask, task dispatch, and task reporting integration points. The inspected 3.8.4 tree did not contain a full User Tasks management module for EDMS assignment, candidate pools, claims, delegation, ownership, and authorization. Re-evaluate the exact tagged source if Elsa is upgraded. See [EDMS-CAPSTONE-01](fit-tests/EDMS-CAPSTONE-01.md) and [the architecture gate](decisions/EDMS-ARCHITECTURE-GATE.md).
+- **Observed in EDMS-CAPSTONE-01:** three RunTask waits were linked to three SQL-backed EDMS review-task records; candidate validation, claim/unclaim, completion, and exact bookmark resume led to WaitAll and continuation. The process test killed the suspended host and completed the review in a fresh process. In the harness, only Elsa state and the task rows were durable; Process B rebuilt a minimal revision row from a task, so this was not full EDMS aggregate durability.
+- **Observed in EDMS-CAPSTONE-01:** a Mechanical comment remained attached to R2 and its review cycle after a new R3 and new cycle were created. A clean R3 cycle advanced the small adapter’s latest/current-valid projections.
+- **Observed in EDMS-CAPSTONE-01:** approval used Reference distribution, then publication invoked an apply-then-throw service twice with one applied operation identity and one transmittal item snapshot. The capstone also tested Reference, Copy, and Move service semantics in temporary storage.
+- **Observed in EDMS-CAPSTONE-01:** a review completed before the tested timer prevented reminder/escalation; cancellation through Elsa’s workflow client produced Finished/Cancelled while the application task service marked the task Cancelled. These are narrow single-runtime integration scenarios, not a complete cancellation protocol.
+- **Observed in EDMS-CAPSTONE-01:** 100 independent workflows and 300 tasks completed without cross-instance state at a concurrency cap of eight workflow-level workers. The local elapsed time is a correctness smoke result, not capacity certification for 50 users.
+- **Architecture decision:** GO WITH CONDITIONS for EDMS foundation work. Keep EDMS business data, authorization, tasks, file semantics, idempotency, and business audit in EDMS modules; use Elsa for orchestration. Start code-first in a single-node modular monolith and treat workflow versions as immutable. See [proposed architecture](architecture/PROPOSED-EDMS-ARCHITECTURE.md), [workflow integration](architecture/WORKFLOW-INTEGRATION.md), [deployment policy](architecture/DEPLOYMENT-POLICY.md), and [EDMS architecture gate](decisions/EDMS-ARCHITECTURE-GATE.md).
+- **Architecture decision:** recommend skipping State Machine evaluation for the initial product unless a concrete state-centric EDMS process appears. The tested review patterns are represented by Flowcharts, explicit waits, joins, cycles, and timers. Keep ELSA-16 TODO until that decision is revisited against a real requirement.
+- **Not established:** multi-node runtime safety, production workload capacity, a durable full EDMS domain across restart in the capstone, complete business audit, outbox behavior, and broad withdrawal/interruption semantics.
+
 ## Reference guides
 
 - [Workflow data](reference/workflow-data.md)
@@ -66,3 +78,6 @@ This is the concise index of verified findings. Each statement is scoped to the 
 - [Activity/application-service pattern](patterns/activity-application-service.md)
 - [Verified Elsa 3.8.4 baseline](versions/elsa-3.8.4.md)
 - [Documentation index and untested coverage](INDEX.md)
+- [EDMS architecture gate](decisions/EDMS-ARCHITECTURE-GATE.md)
+- [Proposed EDMS architecture](architecture/PROPOSED-EDMS-ARCHITECTURE.md)
+- [EDMS capstone evidence](fit-tests/EDMS-CAPSTONE-01.md)

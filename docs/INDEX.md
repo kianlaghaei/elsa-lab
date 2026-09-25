@@ -32,6 +32,17 @@ Each experiment page records observed behavior, source-confirmed details, infere
 These separate fit tests evaluate whether already-tested Elsa patterns fit future EDMS application boundaries. They are not numbered Elsa roadmap milestones.
 
 - [EDMS-FIT-01 — Document Storage and Workflow Side Effects](fit-tests/EDMS-FIT-01-document-storage.md) — physical-move adapter, service-owned file semantics, metadata, and idempotency.
+- [EDMS-CAPSTONE-01 — End-to-End EDMS Architecture Fit](fit-tests/EDMS-CAPSTONE-01.md) — multi-discipline task/bookmark flow, comments and revisions, restart, SLA, idempotency, version coexistence, and concurrency smoke evidence.
+
+## Architecture
+
+- [Architecture gate decision](decisions/EDMS-ARCHITECTURE-GATE.md) — GO WITH CONDITIONS decision, evidence, remaining roadmap disposition, risks, and EDMS-00 recommendation.
+- [Proposed EDMS architecture](architecture/PROPOSED-EDMS-ARCHITECTURE.md)
+- [Domain model blueprint](architecture/DOMAIN-MODEL.md)
+- [Modular monolith boundaries](architecture/MODULE-BOUNDARIES.md)
+- [Elsa integration boundary](architecture/WORKFLOW-INTEGRATION.md)
+- [Deployment policy](architecture/DEPLOYMENT-POLICY.md)
+- [Open business questions](architecture/OPEN-QUESTIONS.md)
 
 ## Reference
 
@@ -63,6 +74,12 @@ These pages synthesize repeated knowledge and point back to experiments for evid
 | Concept | Verified in |
 |---|---|
 | Code-first workflow execution | ELSA-01 |
+| EDMS task records linked to RunTask bookmarks; candidate, claim, unclaim, completion, and authorization adapter | EDMS-CAPSTONE-01 (test adapter only) |
+| Elsa 3.8.4 full User Task assignment/claim backend | Not found in inspected tagged source; re-evaluate on upgrade |
+| Three-discipline WaitAll with external task completion and SQL task records | EDMS-CAPSTONE-01 |
+| Revision/comment/transmittal integration and real process restart during review | EDMS-CAPSTONE-01 (revision repository remains in-memory in restart harness) |
+| Early review completion before SLA escalation and application cancellation | EDMS-CAPSTONE-01; narrow single-runtime scenarios |
+| 100-workflow / 300-task concurrency correctness smoke | EDMS-CAPSTONE-01 (not capacity certification) |
 | Workflow inputs, variables, outputs, and typed result | ELSA-02 |
 | Custom Activity, DI, Activity output, cancellation-token propagation, and tested Activity reuse | ELSA-03 |
 | Conditional routing with `FlowDecision` | ELSA-04 |
@@ -99,6 +116,8 @@ These pages synthesize repeated knowledge and point back to experiments for evid
 | Human Task backend | Not yet tested (ELSA-17) |
 | Load and concurrency | Not yet tested (ELSA-18) |
 | EDMS-like end-to-end workflow | Not yet tested (ELSA-19) |
+
+EDMS-CAPSTONE-01 is a separate fit test and provides partial end-to-end evidence. It does not mark ELSA-14 through ELSA-19 DONE; see the [architecture gate](decisions/EDMS-ARCHITECTURE-GATE.md) for what remains needed, partially covered, recommended to skip, or deferred.
 
 ## Executable Evidence
 

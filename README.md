@@ -1,6 +1,6 @@
 # ElsaLab
 
-ElsaLab is an experimental, code-first repository for learning Elsa Workflows through small implementations and executable tests. It records what was actually observed against a specific Elsa version, with links to source and test evidence.
+ElsaLab is an executable engineering knowledge base for Elsa Workflows. It combines version-pinned experiments, tests, and EDMS-shaped fit tests so developers can distinguish runtime evidence from source findings and architecture inference.
 
 ## What ElsaLab is not
 
@@ -12,6 +12,8 @@ ElsaLab is an experimental, code-first repository for learning Elsa Workflows th
 ## Current progress
 
 ELSA-01 through ELSA-13 are verified against Elsa 3.8.4 and .NET 10. ELSA-14 and later remain TODO in the [roadmap](ROADMAP.md). ELSA-13 verified that code-first instances remain pinned to their stored definition version across publication and process restart when compatible Activity implementations remain deployed. Same-version mutation can replace the stored graph, and deleting a version with active instances deleted those instances and bookmarks in the tested SQL configuration.
+
+The separate [EDMS-CAPSTONE-01](docs/fit-tests/EDMS-CAPSTONE-01.md) combines discipline review tasks, WaitAll, comments, revision history, publication/transmittal, SLA, withdrawal, version coexistence, a real process restart, and a concurrency smoke test. It is a lab fit test, not a production EDMS and not an ELSA roadmap completion. The [architecture gate](docs/decisions/EDMS-ARCHITECTURE-GATE.md) recommends GO WITH CONDITIONS for beginning an EDMS foundation milestone.
 
 ## Knowledge model
 
@@ -34,6 +36,9 @@ The experiment pages preserve the version, implementation commit, limitations, a
 - [Documentation index](docs/INDEX.md)
 - [Roadmap](ROADMAP.md)
 - [Concise learnings](docs/LEARNINGS.md)
+- [EDMS architecture gate](docs/decisions/EDMS-ARCHITECTURE-GATE.md)
+- [Proposed architecture](docs/architecture/PROPOSED-EDMS-ARCHITECTURE.md)
+- [EDMS capstone evidence](docs/fit-tests/EDMS-CAPSTONE-01.md)
 - [ELSA-13 workflow versioning](docs/experiments/ELSA-13-workflow-versioning.md)
 - [EDMS storage fit test](docs/fit-tests/EDMS-FIT-01-document-storage.md)
 - [Automated tests](tests/ElsaLab.Tests/)
