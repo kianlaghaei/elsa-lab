@@ -3,6 +3,7 @@
     <Project Path="src/ElsaLab.Runner/ElsaLab.Runner.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/ElsaLab.ProcessHarness/ElsaLab.ProcessHarness.csproj" />
     <Project Path="tests/ElsaLab.Tests/ElsaLab.Tests.csproj" />
   </Folder>
 </Solution>

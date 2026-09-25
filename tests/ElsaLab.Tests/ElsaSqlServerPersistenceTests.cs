@@ -457,11 +457,13 @@ internal sealed class ElsaSqlTestHost : IAsyncDisposable
 internal sealed class SqlServerTestDatabase : IAsyncDisposable
 {
     private readonly string _masterConnectionString;
+    private readonly string _databaseConnectionString;
 
     private SqlServerTestDatabase(string databaseName, string masterConnectionString, string connectionString)
     {
         DatabaseName = databaseName;
         _masterConnectionString = masterConnectionString;
+        _databaseConnectionString = connectionString;
         ConnectionString = connectionString;
     }
 
@@ -493,7 +495,10 @@ internal sealed class SqlServerTestDatabase : IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        SqlConnection.ClearAllPools();
+        using (var databaseConnection = new SqlConnection(_databaseConnectionString))
+            SqlConnection.ClearPool(databaseConnection);
+        using (var masterConnection = new SqlConnection(_masterConnectionString))
+            SqlConnection.ClearPool(masterConnection);
         await using var connection = new SqlConnection(_masterConnectionString);
         await connection.OpenAsync();
         await using var command = connection.CreateCommand();

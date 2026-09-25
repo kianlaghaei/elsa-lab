@@ -18,6 +18,7 @@
   <ItemGroup>
     <Using Include="Xunit" />
     <ProjectReference Include="..\..\src\ElsaLab.Runner\ElsaLab.Runner.csproj" />
+    <ProjectReference Include="..\ElsaLab.ProcessHarness\ElsaLab.ProcessHarness.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>
