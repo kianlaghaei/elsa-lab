@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Elsa.Scheduling" Version="3.8.4" />
     <PackageReference Include="Elsa.Persistence.EFCore.SqlServer" Version="3.8.4" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.6" />
