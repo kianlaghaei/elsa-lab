@@ -93,9 +93,9 @@ The test has two Host A/Host B scenarios: one detailed payload/state round trip 
 
 ## Code-first definition resolution
 
-**Observed:** A workflow-definition row could be queried from Host B before registration. Calling the resumer at that point threw `NullReferenceException` while the new runtime attempted to materialize the workflow graph; the workflow remained suspended and its bookmark remained present. Building the compiled `DocumentReviewBlockingWorkflow` and registering it through the native `IWorkflowRegistry` on Host B made the subsequent exact-bookmark resume succeed.
+**Observed in this ELSA-09 test:** A workflow-definition row could be queried from Host B before registration. Calling the resumer from the manually constructed service-provider setup at that point threw `NullReferenceException` while the runtime attempted to materialize the workflow graph; the workflow remained suspended and its bookmark remained present. Building `DocumentReviewBlockingWorkflow` and registering it through native `IWorkflowRegistry` then made exact-bookmark resume succeed.
 
-For this compiled code-first path, persistable definition metadata does not replace registering the workflow implementation on application startup. The test records this behavior for the configured runtime/materializer path; it does not establish requirements for Elsa's separately hosted or dynamically authored definition scenarios.
+**Follow-up observed in ELSA-10:** A normally started Elsa `IHost`, with the same persisted typed definition and Activity implementation available, resumed successfully even when its harness did not call `IWorkflowRegistry.RegisterAsync` explicitly. This differs from the ELSA-09 bare-provider setup, which did not run the normal hosted startup path. The experiments therefore do not support a blanket rule that every process must explicitly register a compiled workflow class; they do show the tested process must have compatible workflow/Activity code and Elsa startup/materialization services. See [ELSA-10](ELSA-10-process-restart-recovery.md#workflow-registration-requirement) for details and executable evidence.
 
 ## Confirmed from Elsa 3.8.4 source
 

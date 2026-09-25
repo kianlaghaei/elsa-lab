@@ -1,6 +1,6 @@
 # SQL Server Persistence
 
-This page summarizes the SQL-backed behavior directly exercised by [ELSA-09](../experiments/ELSA-09-sql-server-persistence.md). Findings apply to Elsa 3.8.4 on .NET 10 and the tested SQL Server 2022 setup; they are not process-restart or multi-node guarantees.
+This page summarizes SQL persistence and suspended-workflow recovery exercised by [ELSA-09](../experiments/ELSA-09-sql-server-persistence.md) and [ELSA-10](../experiments/ELSA-10-process-restart-recovery.md). Findings apply to Elsa 3.8.4 on .NET 10 and the tested SQL Server 2022 setup. Process restart of an already-suspended workflow was tested; multi-node recovery was not.
 
 ## Package and provider setup
 
@@ -24,7 +24,13 @@ The tested wait's callback read the persisted bookmark payload and published fin
 
 ## Code-first definition startup
 
-The stored workflow definition row alone did not let the fresh provider materialize the compiled graph in the test. Registering `DocumentReviewBlockingWorkflow` through `IWorkflowRegistry` in Host B enabled resume. Treat registration of compiled code-first workflow implementations on application startup as required for this tested path; other definition hosting modes were not covered.
+The ELSA-09 test used a manually built service provider and observed a materialization failure before explicitly registering `DocumentReviewBlockingWorkflow` through `IWorkflowRegistry`; registration then enabled resume. ELSA-10 used a normal Elsa `IHost` with the persisted typed definition and the Activity implementation available. Its startup populated Elsa's registries, and resume succeeded even though the harness skipped its explicit registration call. The two observations are scoped to their host setups. Do not conclude that the compiled workflow/Activity implementation can be omitted from the application deployment.
+
+## Process-boundary continuation
+
+ELSA-10 launched a separate OS process for each suspend/inspect/resume phase. After a normal host exit, and after the parent killed a still-running process once SQL already showed the suspended state, another process loaded the same workflow and bookmark from the SQL-backed stores. `IWorkflowResumer` continued the exact bookmark; the workflow row remained with `Finished` / `Finished`, outputs were persisted, and the bookmark was removed. Read-only inspection in an intervening process did not consume the bookmark. Two instances remained isolated across process boundaries.
+
+This verifies recovery only after the suspended workflow and bookmark were committed. It does not test process death during an active Activity, a crash before database commit, multi-node operation, or distributed resume races. See [restart recovery](restart-recovery.md) for the source/runtime distinction and limitations.
 
 ## Migrations
 
@@ -42,7 +48,7 @@ dotnet test tests/ElsaLab.Tests/ElsaLab.Tests.csproj --filter Category=SqlServer
 
 ## Boundaries
 
-- Provider reconstruction was tested within one process. Process kill/restart and multi-node resume remain unverified.
+- Suspended-workflow process exit/kill and fresh-process resume were tested in ELSA-10. Interrupted active-Activity recovery and multi-node resume remain unverified.
 - Elsa workflow/runtime persistence is conceptually separate from EDMS document/revision/task data.
 - Elsa state, EDMS database writes, and file/object storage are not established as one ACID transaction by this experiment.
 - See [ELSA-09](../experiments/ELSA-09-sql-server-persistence.md) for full observations, exact test evidence, limitations, and tagged source links.

@@ -13,7 +13,7 @@ Status: **TODO**, **IN PROGRESS**, **DONE**, or **BLOCKED**.
 | ELSA-07 | Blocking Activity / Bookmark | DONE |
 | ELSA-08 | External Event + Suspend / Resume | DONE |
 | ELSA-09 | SQL Server Persistence | DONE |
-| ELSA-10 | Process Kill + Restart + Resume | TODO |
+| ELSA-10 | Process Kill + Restart + Resume | DONE |
 | ELSA-11 | Timers / Delay / SLA / Escalation | TODO |
 | ELSA-12 | Failure Handling + Retry | TODO |
 | ELSA-13 | Workflow Versioning | TODO |

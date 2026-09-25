@@ -21,6 +21,7 @@ The runner uses Elsa's `Elsa` bundle package at 3.8.4. The project does not conf
 | ELSA-07 — Blocking Activity / Bookmark | [`84b1aae1ca41cfa3f12e19569fd5679d9079b8cb`](https://github.com/kianlaghaei/elsa-lab/commit/84b1aae1ca41cfa3f12e19569fd5679d9079b8cb) | [Experiment record](../experiments/ELSA-07-blocking-bookmark.md) |
 | ELSA-08 — External Event + Suspend / Resume | [`164256325697f1ca5b9db2e220cf4016715bbd53`](https://github.com/kianlaghaei/elsa-lab/commit/164256325697f1ca5b9db2e220cf4016715bbd53) | [Experiment record](../experiments/ELSA-08-external-resume.md) |
 | ELSA-09 — SQL Server Persistence | [`817c3fbc62da4e573bb6722ab1a265008a604dd8`](https://github.com/kianlaghaei/elsa-lab/commit/817c3fbc62da4e573bb6722ab1a265008a604dd8) | [Experiment record](../experiments/ELSA-09-sql-server-persistence.md) |
+| ELSA-10 — Process Kill + Restart + Resume | [`0a96a5be0e15204c8aa6a7bd98bf8714910bd6d1`](https://github.com/kianlaghaei/elsa-lab/commit/0a96a5be0e15204c8aa6a7bd98bf8714910bd6d1) | [Experiment record](../experiments/ELSA-10-process-restart-recovery.md) |
 
 ## Upgrade rule
 
