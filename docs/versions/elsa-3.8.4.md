@@ -5,6 +5,7 @@
 | Elsa version | 3.8.4 |
 | Target framework | .NET 10 (`net10.0`) |
 | Primary package | `Elsa` 3.8.4 |
+| Scheduling package used by ELSA-11 | `Elsa.Scheduling` 3.8.4 |
 
 The runner uses Elsa's `Elsa` bundle package at 3.8.4. The project does not configure Elsa Server API endpoints, Studio, or a Designer.
 
@@ -22,6 +23,7 @@ The runner uses Elsa's `Elsa` bundle package at 3.8.4. The project does not conf
 | ELSA-08 — External Event + Suspend / Resume | [`164256325697f1ca5b9db2e220cf4016715bbd53`](https://github.com/kianlaghaei/elsa-lab/commit/164256325697f1ca5b9db2e220cf4016715bbd53) | [Experiment record](../experiments/ELSA-08-external-resume.md) |
 | ELSA-09 — SQL Server Persistence | [`817c3fbc62da4e573bb6722ab1a265008a604dd8`](https://github.com/kianlaghaei/elsa-lab/commit/817c3fbc62da4e573bb6722ab1a265008a604dd8) | [Experiment record](../experiments/ELSA-09-sql-server-persistence.md) |
 | ELSA-10 — Process Kill + Restart + Resume | [`0a96a5be0e15204c8aa6a7bd98bf8714910bd6d1`](https://github.com/kianlaghaei/elsa-lab/commit/0a96a5be0e15204c8aa6a7bd98bf8714910bd6d1) | [Experiment record](../experiments/ELSA-10-process-restart-recovery.md) |
+| ELSA-11 — Timers / Delay / SLA / Escalation | [`3d475607e78ae3b1483ebac8bc9fccd6e5d9a869`](https://github.com/kianlaghaei/elsa-lab/commit/3d475607e78ae3b1483ebac8bc9fccd6e5d9a869) | [Experiment record](../experiments/ELSA-11-sla-timers-escalation.md) |
 
 ## Upgrade rule
 

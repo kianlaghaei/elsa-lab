@@ -23,6 +23,7 @@ Each experiment page records observed behavior, source-confirmed details, infere
 - [ELSA-08 — External Event + Suspend / Resume](experiments/ELSA-08-external-resume.md)
 - [ELSA-09 — SQL Server Persistence](experiments/ELSA-09-sql-server-persistence.md)
 - [ELSA-10 — Process Kill + Restart + Resume](experiments/ELSA-10-process-restart-recovery.md)
+- [ELSA-11 — Timers / Delay / SLA / Escalation](experiments/ELSA-11-sla-timers-escalation.md)
 
 ## EDMS Fit Tests
 
@@ -42,6 +43,7 @@ These pages synthesize repeated knowledge and point back to experiments for evid
 - [Blocking Activities and Bookmarks](reference/blocking-and-bookmarks.md)
 - [SQL Server persistence](reference/sql-server-persistence.md)
 - [Process restart recovery](reference/restart-recovery.md)
+- [Timers and SLA](reference/timers-and-sla.md)
 
 ## Patterns
 
@@ -50,7 +52,7 @@ These pages synthesize repeated knowledge and point back to experiments for evid
 ## Version Notes
 
 - [Elsa 3.8.4 baseline](versions/elsa-3.8.4.md)
-- All ten completed experiments were verified against Elsa 3.8.4 and .NET 10 (`net10.0`). Re-run relevant experiments before relying on these findings after an Elsa upgrade.
+- All eleven completed experiments were verified against Elsa 3.8.4 and .NET 10 (`net10.0`). Re-run relevant experiments before relying on these findings after an Elsa upgrade.
 
 ## Current Knowledge Coverage
 
@@ -67,12 +69,15 @@ These pages synthesize repeated knowledge and point back to experiments for evid
 | AutoBurn consumption, no-callback AutoComplete, duplicate exact resume, and instance isolation | ELSA-08 |
 | SQL Server persistence for suspended instances and bookmarks; fresh-provider rehydration/resume | ELSA-09 |
 | Process exit/kill after a committed suspension, fresh-process reload, and exact bookmark resume | ELSA-10 |
+| Durable `Delay` bookmark in SQL and overdue timer restored after single-node process restart | ELSA-11 |
+| Reminder/escalation sequence and early review completion cancelling the tested timer branch | ELSA-11 |
+| Clustered scheduling ownership and distributed timer delivery | Not verified |
 | Interrupted active Activity recovery | Not verified |
 | Distributed/multi-node recovery and concurrent resume ownership | Not verified |
 | Stimulus-based bookmark matching / correlation | Not yet tested |
 | Resume-time data consumed through workflow inputs | Not verified in the tested `IWorkflowResumer` code-first path (ELSA-08) |
 | SQL persistence across fresh DI/runtime reconstruction | ELSA-09 |
-| Timers, delay, SLA, and escalation | Not yet tested (ELSA-11) |
+| Timers, delay, SLA, and escalation | ELSA-11 |
 | Failure handling and retry | Not yet tested (ELSA-12) |
 | Workflow versioning | Not yet tested (ELSA-13) |
 | End-to-end workflow cancellation/interruption lifecycle | Not yet tested (ELSA-14); token propagation to a service was tested in ELSA-03 |

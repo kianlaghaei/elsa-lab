@@ -11,7 +11,7 @@ ElsaLab is an experimental, code-first repository for learning Elsa Workflows th
 
 ## Current progress
 
-ELSA-01 through ELSA-10 are verified against Elsa 3.8.4 and .NET 10. ELSA-11 and later remain TODO in the [roadmap](ROADMAP.md). ELSA-10 verifies that a committed suspended workflow survives a real process exit or termination and resumes from SQL in a new process. Interrupted active Activities and distributed recovery remain untested.
+ELSA-01 through ELSA-11 are verified against Elsa 3.8.4 and .NET 10. ELSA-12 and later remain TODO in the [roadmap](ROADMAP.md). ELSA-10 verified restart recovery for a committed suspended workflow; ELSA-11 verified SQL-backed Delay restoration after graceful exit and kill-after-commit, including overdue timer recovery in a new process. Interrupted active Activities and clustered scheduling remain untested.
 
 ## Knowledge model
 
@@ -53,12 +53,13 @@ The runner demonstrates EDMS-FIT-01: an Elsa `FlowDecision` selects an approved 
 
 ## SQL Server integration tests
 
-The ELSA-09 and ELSA-10 integration tests use a dedicated SQL Server connection from `ELSALAB_SQLSERVER_CONNECTION_STRING`. They create and remove uniquely named `ElsaLab_<guid>` test databases, so the configured test identity must have database create/drop permissions. No connection string or credentials belong in source control. Configure a local or dedicated test-server connection in your shell and run:
+The ELSA-09, ELSA-10, and ELSA-11 integration tests use a dedicated SQL Server connection from `ELSALAB_SQLSERVER_CONNECTION_STRING`. They create and remove uniquely named `ElsaLab_<guid>` test databases, so the configured test identity must have database create/drop permissions. No connection string or credentials belong in source control. Configure a local or dedicated test-server connection in your shell and run:
 
 ```powershell
 $env:ELSALAB_SQLSERVER_CONNECTION_STRING = "Server=<sql-server>;Initial Catalog=master;Integrated Security=True;TrustServerCertificate=True;Encrypt=False"
 dotnet test tests/ElsaLab.Tests/ElsaLab.Tests.csproj --filter Category=SqlServer
 dotnet test tests/ElsaLab.Tests/ElsaLab.Tests.csproj --filter Category=ProcessRestart
+dotnet test tests/ElsaLab.Tests/ElsaLab.Tests.csproj --filter Category=SlaTimer
 ```
 
-The process tests build and launch `tests/ElsaLab.ProcessHarness` as separate OS processes. When the environment variable is absent, SQL integration tests are skipped and the in-memory suite remains runnable. See [ELSA-09](docs/experiments/ELSA-09-sql-server-persistence.md) for SQL provider setup and [ELSA-10](docs/experiments/ELSA-10-process-restart-recovery.md) for process-restart findings.
+The process tests build and launch `tests/ElsaLab.ProcessHarness` as separate OS processes. When the environment variable is absent, SQL integration tests are skipped and the in-memory suite remains runnable. See [ELSA-09](docs/experiments/ELSA-09-sql-server-persistence.md) for SQL provider setup, [ELSA-10](docs/experiments/ELSA-10-process-restart-recovery.md) for suspended-workflow recovery, and [ELSA-11](docs/experiments/ELSA-11-sla-timers-escalation.md) for timer/SLA findings.

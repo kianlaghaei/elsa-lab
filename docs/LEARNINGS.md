@@ -29,6 +29,10 @@ This is the concise index of verified findings. Each statement is scoped to the 
 - **Observed in ELSA-10:** A workflow already committed as `Running` / `Suspended` remained loadable after its original OS process exited or was killed. A new process resumed the exact bookmark through `IWorkflowResumer`, and SQL state changed to `Finished` / `Finished` with final outputs and no bookmark. This does not test a crash during an active Activity or distributed recovery. See [ELSA-10](experiments/ELSA-10-process-restart-recovery.md) and [restart recovery](reference/restart-recovery.md).
 - **Observed in ELSA-10:** Starting an inspection host did not consume or change the bookmark. Two suspended instances remained isolated across processes. Repeating a resume from another process after completion returned no workflow response and left the finished state unchanged. See [ELSA-10](experiments/ELSA-10-process-restart-recovery.md).
 - **Source-confirmed and observed in ELSA-10:** Elsa's startup recovery scans `Running` / `Interrupted` workflows and a recurring task selects stale `IsExecuting=true` instances. The tested already-suspended bookmark was not automatically continued by startup; it required exact bookmark resume. This does not establish recovery for an Activity interrupted mid-side-effect. See [ELSA-10](experiments/ELSA-10-process-restart-recovery.md) and [restart recovery](reference/restart-recovery.md).
+- **Observed in ELSA-11:** `Elsa.Scheduling`'s `Delay` leaves a SQL-persisted workflow `Running` / `Suspended` with an `Elsa.Delay` bookmark until due; after the delay the timer is consumed and the workflow finishes. Elsa execution logs recorded `Started`, `Suspended`, `Resumed`, and `Completed` under the same Delay `ActivityInstanceId`. See [ELSA-11](experiments/ELSA-11-sla-timers-escalation.md) and [timers and SLA](reference/timers-and-sla.md).
+- **Observed in ELSA-11:** A fresh process restored a committed future timer, and another process restored an overdue timer after Process A was killed only after SQL confirmed persistence. Elsa's local scheduler plus startup bookmark restoration sufficed; clustered scheduling was not tested. See [ELSA-11](experiments/ELSA-11-sla-timers-escalation.md).
+- **Observed in ELSA-11:** In the tested `While` / `Fork` race, `Event("ReviewCompleted")` followed by Elsa `Break` cancelled the Delay bookmark. The workflow finished OnTime with no reminder/escalation, including after the original deadline passed while the runtime remained alive. See [ELSA-11](experiments/ELSA-11-sla-timers-escalation.md).
+- **Observed in ELSA-11:** Activity operation IDs made the sample action service idempotent for identical commands and rejected conflicting key reuse. The service was in memory, so durable cross-process side-effect idempotency remains an application responsibility. See [ELSA-11](experiments/ELSA-11-sla-timers-escalation.md) and [ELSA-11 source](../src/ElsaLab.Runner/Services/ReviewSlaActionService.cs).
 
 ## EDMS fit-test findings
 
@@ -46,6 +50,7 @@ This is the concise index of verified findings. Each statement is scoped to the 
 - [Blocking Activities and Bookmarks](reference/blocking-and-bookmarks.md)
 - [SQL Server persistence](reference/sql-server-persistence.md)
 - [Process restart recovery](reference/restart-recovery.md)
+- [Timers and SLA](reference/timers-and-sla.md)
 - [Activity/application-service pattern](patterns/activity-application-service.md)
 - [Verified Elsa 3.8.4 baseline](versions/elsa-3.8.4.md)
 - [Documentation index and untested coverage](INDEX.md)
