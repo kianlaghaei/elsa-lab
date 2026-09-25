@@ -1,11 +1,11 @@
 # EDMS-CAPSTONE-01 — End-to-End EDMS Architecture Fit
 
-Status: VERIFIED FOR THE LAB SCENARIOS  
-Elsa: 3.8.4  
-.NET: 10  
-Database integration: SQL Server 2022 (major version 16)  
-Verified date: 2026-09-25  
-Implementation commit: d23c5c4ef23f86117c50d492cc1b48f320e5d17e
+- Status: VERIFIED FOR THE LAB SCENARIOS
+- Elsa: 3.8.4
+- .NET: 10
+- Database integration: SQL Server 2022 (major version 16)
+- Verified date: 2026-09-25
+- Implementation commit: d23c5c4ef23f86117c50d492cc1b48f320e5d17e
 
 ## Purpose and scope
 

@@ -1,8 +1,8 @@
 # EDMS Architecture Gate
 
-Decision date: 2026-09-25  
-Evidence baseline: Elsa 3.8.4, .NET 10, SQL Server 2022 test instance  
-Capstone implementation commit: d23c5c4ef23f86117c50d492cc1b48f320e5d17e
+- Decision date: 2026-09-25
+- Evidence baseline: Elsa 3.8.4, .NET 10, SQL Server 2022 test instance
+- Capstone implementation commit: d23c5c4ef23f86117c50d492cc1b48f320e5d17e
 
 ## Decision
 
