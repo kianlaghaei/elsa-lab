@@ -12,6 +12,7 @@
     <PackageReference Include="Elsa.Resilience" Version="3.8.4" />
     <PackageReference Include="Elsa.Scheduling" Version="3.8.4" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.6" />
   </ItemGroup>
 
 </Project>
