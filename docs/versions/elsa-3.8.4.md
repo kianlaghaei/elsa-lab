@@ -26,6 +26,7 @@ The runner uses Elsa's `Elsa` bundle package at 3.8.4. The project does not conf
 | ELSA-10 — Process Kill + Restart + Resume | [`0a96a5be0e15204c8aa6a7bd98bf8714910bd6d1`](https://github.com/kianlaghaei/elsa-lab/commit/0a96a5be0e15204c8aa6a7bd98bf8714910bd6d1) | [Experiment record](../experiments/ELSA-10-process-restart-recovery.md) |
 | ELSA-11 — Timers / Delay / SLA / Escalation | [`3d475607e78ae3b1483ebac8bc9fccd6e5d9a869`](https://github.com/kianlaghaei/elsa-lab/commit/3d475607e78ae3b1483ebac8bc9fccd6e5d9a869) | [Experiment record](../experiments/ELSA-11-sla-timers-escalation.md) |
 | ELSA-12 — Failure Handling + Retry | [`ca6d2e103fc69f9f5b6c1db381c384511089ead0`](https://github.com/kianlaghaei/elsa-lab/commit/ca6d2e103fc69f9f5b6c1db381c384511089ead0) | [Experiment record](../experiments/ELSA-12-failure-retry-incidents.md) |
+| ELSA-13 — Workflow Definition Versioning | Pending feature commit | [Experiment record](../experiments/ELSA-13-workflow-versioning.md) |
 
 ## Upgrade rule
 

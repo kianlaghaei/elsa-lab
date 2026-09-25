@@ -149,6 +149,51 @@ public sealed class ElsaProcessRestartTests
         _output.WriteLine($"Process C independently resumed B (PID {processC.ProcessId}).");
     }
 
+    [ProcessRestartFact]
+    [Trait("Category", "ProcessRestart")]
+    [Trait("Category", "WorkflowVersioning")]
+    public async Task V1SuspendedInProcessA_RemainsPinnedWhenProcessBDeploysAndStartsV2()
+    {
+        await using var database = await SqlServerTestDatabase.CreateAsync(GetConnectionString());
+        using var workspace = new ProcessWorkspace();
+
+        var processA = await RunChildAsync(workspace, database.ConnectionString, "versioning-seed-v1");
+        Assert.Equal("EngineeringReview", GetString(processA.Message, "definitionId"));
+        Assert.Equal("EngineeringReview-v1", GetString(processA.Message, "definitionVersionId"));
+        Assert.Equal(1, GetInt32(processA.Message, "version"));
+        Assert.Equal("Running", GetString(processA.Message, "status"));
+        Assert.Equal("Suspended", GetString(processA.Message, "subStatus"));
+
+        var v1InstanceId = GetString(processA.Message, "workflowInstanceId");
+        var v1BookmarkId = GetString(processA.Message, "bookmarkId");
+        var processB = await RunChildAsync(workspace, database.ConnectionString,
+            "versioning-deploy-v2", v1InstanceId, v1BookmarkId);
+        Assert.NotEqual(processA.ProcessId, processB.ProcessId);
+        Assert.Equal(processA.ProcessId, GetInt32(processA.Message, "processId"));
+        Assert.Equal(processB.ProcessId, GetInt32(processB.Message, "processId"));
+
+        var v1 = GetProperty(processB.Message, "v1");
+        Assert.Equal(v1InstanceId, GetString(v1, "workflowInstanceId"));
+        Assert.Equal("EngineeringReview", GetString(v1, "definitionId"));
+        Assert.Equal("EngineeringReview-v1", GetString(v1, "definitionVersionId"));
+        Assert.Equal(1, GetInt32(v1, "version"));
+        Assert.Equal("Finished", GetString(v1, "status"));
+        Assert.Equal("Finished", GetString(v1, "subStatus"));
+        Assert.Equal("V1", GetString(v1, "marker"));
+        Assert.False(GetBoolean(v1, "coordinatorExecuted"));
+        Assert.True(GetBoolean(v1, "originalBookmarkConsumed"));
+        Assert.Equal(GetString(processA.Message, "bookmarkHash"), GetString(v1, "originalBookmarkHash"));
+
+        var v2 = GetProperty(processB.Message, "v2");
+        Assert.Equal("EngineeringReview", GetString(v2, "definitionId"));
+        Assert.Equal("EngineeringReview-v2", GetString(v2, "definitionVersionId"));
+        Assert.Equal(2, GetInt32(v2, "version"));
+        Assert.Equal("Running", GetString(v2, "status"));
+        Assert.Equal("Suspended", GetString(v2, "subStatus"));
+        Assert.True(GetBoolean(v2, "bookmarkExists"));
+        _output.WriteLine($"Process A (PID {processA.ProcessId}) suspended DefinitionVersionId EngineeringReview-v1; Process B (PID {processB.ProcessId}) registered V2, started a new V2 instance, and resumed the original V1 instance as V1.");
+    }
+
     private static async Task<ProcessResult> RunChildAsync(ProcessWorkspace workspace, string connectionString, params string[] arguments)
     {
         await using var child = StartChild(workspace, connectionString, arguments);

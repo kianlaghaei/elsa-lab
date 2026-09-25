@@ -39,6 +39,11 @@ This is the concise index of verified findings. Each statement is scoped to the 
 - **Observed in ELSA-12:** A fault incident survived SQL persistence and a real OS process exit. Its Activity ID and message survived, but the custom exception `Type` rehydrated as `System.Exception` in the tested SQL provider path. See [ELSA-12](experiments/ELSA-12-failure-retry-incidents.md).
 - **Observed in ELSA-12 and EDMS-FIT-01:** Elsa retry repeated the Activity/service call. An apply-then-throw retry was safe only because the application service recognized the same operation ID as already applied; reusing that key for a materially different command was rejected. Elsa does not provide exactly-once behavior for arbitrary external side effects. See [ELSA-12](experiments/ELSA-12-failure-retry-incidents.md) and [EDMS-FIT-01](fit-tests/EDMS-FIT-01-document-storage.md).
 
+- **Observed in ELSA-13:** A running SQL-backed workflow instance stores its logical DefinitionId, DefinitionVersionId, and integer Version. Publishing V2 did not change a suspended V1 instance's reference; exact bookmark resume after V2 publication and a real process restart completed it on V1. New starts selected V2 through the Published selector. See [ELSA-13](experiments/ELSA-13-workflow-versioning.md) and [workflow versioning](reference/workflow-versioning.md).
+- **Observed in ELSA-13:** Latest and Published are separate flags: a latest unpublished V2 draft coexisted with published V1. Same DefinitionId plus same version ID/number was not immutable; registering changed code replaced stored graph data and changed the old instance's continuation. See [ELSA-13](experiments/ELSA-13-workflow-versioning.md).
+- **Observed in ELSA-13:** A stored typed graph could resume without the original WorkflowBase class being registered, but a missing Activity implementation became Elsa.NotFoundActivity; resume faulted and AutoBurn consumed the bookmark. Retain compatible old Activity implementations while instances can reach them. See [ELSA-13](experiments/ELSA-13-workflow-versioning.md).
+- **Observed in ELSA-13:** Retraction removed a version from Published selection while preserving the tested suspended instance/bookmark; deleting a version with an active instance deleted the instance and bookmark. Do not treat retraction and deletion as equivalent. See [ELSA-13](experiments/ELSA-13-workflow-versioning.md).
+- **Source-confirmed in Elsa 3.8.4; code-first migration untested:** Elsa has an explicit Migrate alteration that changes the execution graph to a selected version; Elsa's tagged migration integration test covers stored JSON definitions. The ELSA-13 code-first path did not automatically migrate. See [ELSA-13](experiments/ELSA-13-workflow-versioning.md).
 ## EDMS fit-test findings
 
 - **Observed in EDMS-FIT-01:** Elsa's `FlowDecision` selected one storage route and a thin custom `CodeActivity` called `IDocumentStorageService`; the service moved the test file and updated metadata. The workflow published the service result and finished without faulted Activity contexts. See [EDMS-FIT-01](fit-tests/EDMS-FIT-01-document-storage.md).
@@ -57,6 +62,7 @@ This is the concise index of verified findings. Each statement is scoped to the 
 - [Process restart recovery](reference/restart-recovery.md)
 - [Timers and SLA](reference/timers-and-sla.md)
 - [Failure, retry and incidents](reference/failure-retry-incidents.md)
+- [Workflow definition versioning](reference/workflow-versioning.md)
 - [Activity/application-service pattern](patterns/activity-application-service.md)
 - [Verified Elsa 3.8.4 baseline](versions/elsa-3.8.4.md)
 - [Documentation index and untested coverage](INDEX.md)

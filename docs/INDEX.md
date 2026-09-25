@@ -25,6 +25,7 @@ Each experiment page records observed behavior, source-confirmed details, infere
 - [ELSA-10 — Process Kill + Restart + Resume](experiments/ELSA-10-process-restart-recovery.md)
 - [ELSA-11 — Timers / Delay / SLA / Escalation](experiments/ELSA-11-sla-timers-escalation.md)
 - [ELSA-12 — Failure Handling + Retry](experiments/ELSA-12-failure-retry-incidents.md)
+- [ELSA-13 — Workflow Definition Versioning](experiments/ELSA-13-workflow-versioning.md)
 
 ## EDMS Fit Tests
 
@@ -46,6 +47,7 @@ These pages synthesize repeated knowledge and point back to experiments for evid
 - [Process restart recovery](reference/restart-recovery.md)
 - [Timers and SLA](reference/timers-and-sla.md)
 - [Failure, retry and incidents](reference/failure-retry-incidents.md)
+- [Workflow definition versioning](reference/workflow-versioning.md)
 
 ## Patterns
 
@@ -54,7 +56,7 @@ These pages synthesize repeated knowledge and point back to experiments for evid
 ## Version Notes
 
 - [Elsa 3.8.4 baseline](versions/elsa-3.8.4.md)
-- All twelve completed experiments were verified against Elsa 3.8.4 and .NET 10 (`net10.0`). Re-run relevant experiments before relying on these findings after an Elsa upgrade.
+- All thirteen completed experiments were verified against Elsa 3.8.4 and .NET 10 (`net10.0`). Re-run relevant experiments before relying on these findings after an Elsa upgrade.
 
 ## Current Knowledge Coverage
 
@@ -87,7 +89,10 @@ These pages synthesize repeated knowledge and point back to experiments for evid
 | SQL persistence across fresh DI/runtime reconstruction | ELSA-09 |
 | Timers, delay, SLA, and escalation | ELSA-11 |
 | Failure handling and retry | ELSA-12 |
-| Workflow versioning | Not yet tested (ELSA-13) |
+| Workflow definition identity, latest/published selection, pinned instances, and old-code compatibility | ELSA-13 |
+| Same-version code-first mutation can overwrite a stored definition and alter suspended-instance continuation | ELSA-13 |
+| Retraction preserves tested active instances; deleting a referenced definition version deletes its instance and bookmark | ELSA-13 |
+| Explicit Migrate alteration exists; typed code-first migration not tested | Elsa 3.8.4 source and integration test; code-first behavior unverified |
 | End-to-end workflow cancellation/interruption lifecycle | Not yet tested (ELSA-14); token propagation to a service was tested in ELSA-03 |
 | Broad execution history/audit/observability | Not yet tested (ELSA-15); selected in-process journal fields were inspected in ELSA-02 through ELSA-04 |
 | State machine evaluation | Not yet tested (ELSA-16) |

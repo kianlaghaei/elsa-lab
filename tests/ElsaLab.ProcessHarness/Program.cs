@@ -47,6 +47,7 @@ internal static class Program
                 "resume" when args.Length == 3 => await ResumeAsync(connectionString, args[1], args[2], registerWorkflow: true),
                 "resume-other" when args.Length == 5 => await ResumeOtherAsync(connectionString, args[1], args[2], args[3], args[4]),
                 "resume-unregistered" when args.Length == 3 => await ResumeAsync(connectionString, args[1], args[2], registerWorkflow: false),
+                _ when args[0].StartsWith("versioning-", StringComparison.Ordinal) => await WorkflowVersioningProcessHarness.RunAsync(connectionString, args),
                 _ when args[0].StartsWith("sla-", StringComparison.Ordinal) => await SlaTimerProcessHarness.RunAsync(connectionString, args),
                 _ when args[0].StartsWith("failure-", StringComparison.Ordinal) => await FailureProcessHarness.RunAsync(connectionString, args),
                 _ => throw new ArgumentException($"Invalid arguments for command '{args[0]}'.")
